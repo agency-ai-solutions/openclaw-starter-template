@@ -18,7 +18,7 @@ ENV PYTHONUNBUFFERED=1 \
     OPENCLAW_LOG_PATH=/mnt/openclaw/logs/openclaw-gateway.log \
     OPENCLAW_PORT=18789 \
     OPENCLAW_DEFAULT_MODEL=openclaw:main \
-    OPENCLAW_PROVIDER_MODEL=openai/gpt-4o-mini
+    OPENCLAW_PROVIDER_MODEL=openai/gpt-5-mini
 
 COPY --from=openclaw-runtime /usr/local/ /usr/local/
 

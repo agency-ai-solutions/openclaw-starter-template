@@ -43,7 +43,7 @@ Running `python onboarding_tool.py` writes `onboarding_config.py`.
 - `OPENCLAW_CONFIG_PATH=/mnt/openclaw/openclaw.json`
 - `OPENCLAW_LOG_PATH=/mnt/openclaw/logs/openclaw-gateway.log`
 - `OPENCLAW_PORT=18789`
-- `OPENCLAW_PROVIDER_MODEL=openai/gpt-4o-mini`
+- `OPENCLAW_PROVIDER_MODEL=openai/gpt-5-mini`
 
 ## Deterministic build policy
 
@@ -59,6 +59,15 @@ Upgrade rule:
 2. Rebuild image.
 3. Re-run integration/E2E checks.
 4. Deploy only after validation.
+
+## Agency Swarm dependency pin
+
+`requirements.txt` is pinned to an Agency Swarm commit that includes OpenClaw integration APIs used by this template.
+
+Upgrade rule:
+
+1. Move to an official Agency Swarm release once it includes `agency_swarm.integrations.openclaw`.
+2. Re-run template deploy smoke tests before publishing changes.
 
 ## Local run
 
