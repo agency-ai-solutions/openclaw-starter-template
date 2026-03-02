@@ -26,12 +26,15 @@ except ImportError:
 
 def _get_config_value(key: str) -> str:
     value = onboarding_config.get(key, _DEFAULT_ONBOARDING_CONFIG.get(key, ""))
+    if value is None:
+        return ""
     return value.strip() if isinstance(value, str) else str(value)
 
 
 def _apply_openclaw_config_overrides() -> None:
     raw_overrides = _get_config_value("openclaw_config_overrides_json")
     if not raw_overrides:
+        os.environ.setdefault("OPENCLAW_PROXY_API_KEY", os.getenv("OPENCLAW_GATEWAY_TOKEN", "openclaw-local-token"))
         return
 
     try:
@@ -46,6 +49,8 @@ def _apply_openclaw_config_overrides() -> None:
         if not isinstance(key, str) or not key.startswith("OPENCLAW_"):
             continue
         os.environ[key] = str(value)
+
+    os.environ.setdefault("OPENCLAW_PROXY_API_KEY", os.getenv("OPENCLAW_GATEWAY_TOKEN", "openclaw-local-token"))
 
 
 def _build_openclaw_agent() -> Agent:

@@ -15,7 +15,6 @@ logging.basicConfig(level=logging.INFO)
 def _configure_openclaw_proxy_env() -> None:
     port = os.getenv("PORT", "8080")
     os.environ.setdefault("OPENCLAW_PROXY_BASE_URL", f"http://127.0.0.1:{port}/openclaw/v1")
-    os.environ.setdefault("OPENCLAW_PROXY_API_KEY", os.getenv("OPENCLAW_GATEWAY_TOKEN", "openclaw-local-token"))
 
 
 def create_app():
