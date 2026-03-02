@@ -45,11 +45,11 @@ Running `python onboarding_tool.py` writes `onboarding_config.py`.
 - `OPENCLAW_PORT=18789`
 - `OPENCLAW_PROVIDER_MODEL=openai/gpt-5-mini`
 
-## Shared instructions behavior
+## Instructions behavior
 
-- `shared_instructions.md` is loaded and prepended to the agent instructions at runtime.
-- This applies to the OpenClaw-backed agent too.
-- If the file is missing, the template now falls back to no shared instructions (instead of passing a filename literal as instruction text).
+- The OpenClaw agent instructions come from the onboarding field `agent_instructions`.
+- This template does not apply agency-level shared instructions by default.
+- To change behavior, update `agent_instructions` in onboarding or edit `agency.py`.
 
 ## Deterministic build policy
 
