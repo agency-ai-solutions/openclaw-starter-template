@@ -12,14 +12,7 @@ load_dotenv()
 logging.basicConfig(level=logging.INFO)
 
 
-def _configure_openclaw_proxy_env() -> None:
-    port = os.getenv("PORT", "8080")
-    os.environ.setdefault("OPENCLAW_PROXY_BASE_URL", f"http://127.0.0.1:{port}/openclaw/v1")
-
-
 def create_app():
-    _configure_openclaw_proxy_env()
-
     app = run_fastapi(
         agencies={"openclaw": create_agency},
         app_token_env="APP_TOKEN",

@@ -33,24 +33,21 @@ def _get_config_value(key: str) -> str:
 
 def _apply_openclaw_config_overrides() -> None:
     raw_overrides = _get_config_value("openclaw_config_overrides_json")
-    if not raw_overrides:
-        os.environ.setdefault("OPENCLAW_PROXY_API_KEY", os.getenv("OPENCLAW_GATEWAY_TOKEN", "openclaw-local-token"))
-        return
+    if raw_overrides:
+        try:
+            overrides = json.loads(raw_overrides)
+        except json.JSONDecodeError:
+            overrides = {}
 
-    try:
-        overrides = json.loads(raw_overrides)
-    except json.JSONDecodeError:
-        return
+        if isinstance(overrides, dict):
+            for key, value in overrides.items():
+                if not isinstance(key, str) or not key.startswith("OPENCLAW_"):
+                    continue
+                os.environ[key] = str(value)
 
-    if not isinstance(overrides, dict):
-        return
-
-    for key, value in overrides.items():
-        if not isinstance(key, str) or not key.startswith("OPENCLAW_"):
-            continue
-        os.environ[key] = str(value)
-
-    os.environ.setdefault("OPENCLAW_PROXY_API_KEY", os.getenv("OPENCLAW_GATEWAY_TOKEN", "openclaw-local-token"))
+    proxy_api_key = os.getenv("APP_TOKEN") or os.getenv("OPENCLAW_GATEWAY_TOKEN")
+    if proxy_api_key:
+        os.environ.setdefault("OPENCLAW_PROXY_API_KEY", proxy_api_key)
 
 
 def _build_openclaw_agent() -> Agent:
@@ -58,12 +55,15 @@ def _build_openclaw_agent() -> Agent:
 
     model_id = _get_config_value("openclaw_model") or "openclaw:main"
     instructions = _get_config_value("agent_instructions") or _DEFAULT_ONBOARDING_CONFIG["agent_instructions"]
+    base_url = os.getenv("OPENCLAW_PROXY_BASE_URL")
+    if not base_url:
+        base_url = f"http://127.0.0.1:{os.getenv('PORT', '8080')}/openclaw/v1"
 
     return Agent(
         name=_get_config_value("agent_name") or _DEFAULT_ONBOARDING_CONFIG["agent_name"],
         description=_get_config_value("agent_description") or _DEFAULT_ONBOARDING_CONFIG["agent_description"],
         instructions=instructions,
-        model=build_openclaw_responses_model(model=model_id),
+        model=build_openclaw_responses_model(model=model_id, base_url=base_url),
     )
 
 
