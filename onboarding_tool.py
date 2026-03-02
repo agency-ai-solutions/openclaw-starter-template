@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-import json
 import os
+import pprint
 
 from dotenv import load_dotenv
 from pydantic import Field
@@ -38,7 +38,7 @@ class OnboardingTool(BaseTool):
         config = self.model_dump()
         python_code = (
             "# Auto-generated onboarding configuration\n\n"
-            f"config = {json.dumps(config, indent=4, ensure_ascii=True)}\n"
+            f"config = {pprint.pformat(config, sort_dicts=True)}\n"
         )
 
         with open(config_path, "w", encoding="utf-8") as file:
