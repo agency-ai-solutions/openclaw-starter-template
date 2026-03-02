@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import os
+from pathlib import Path
 
 from dotenv import load_dotenv
 
@@ -17,6 +18,7 @@ _DEFAULT_ONBOARDING_CONFIG: dict[str, str] = {
     "agent_instructions": "Handle user tasks and call tools when needed.",
     "openclaw_config_overrides_json": "",
 }
+_SHARED_INSTRUCTIONS_PATH = Path(__file__).resolve().parent / "shared_instructions.md"
 
 try:
     from onboarding_config import config as onboarding_config
@@ -67,13 +69,19 @@ def _build_openclaw_agent() -> Agent:
     )
 
 
+def _resolve_shared_instructions() -> str:
+    if not _SHARED_INSTRUCTIONS_PATH.exists():
+        return ""
+    return _SHARED_INSTRUCTIONS_PATH.read_text(encoding="utf-8").strip()
+
+
 # Do not remove this method. Deploy flow imports it from main.py.
 def create_agency(load_threads_callback=None):
     openclaw_agent = _build_openclaw_agent()
     return Agency(
         openclaw_agent,
         name="OpenClawAgency",
-        shared_instructions="shared_instructions.md",
+        shared_instructions=_resolve_shared_instructions(),
         load_threads_callback=load_threads_callback,
     )
 
