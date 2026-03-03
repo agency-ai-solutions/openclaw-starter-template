@@ -79,8 +79,6 @@ With this template defaults, OpenClaw state lives under `/mnt/openclaw`, and wor
 - `/mnt/openclaw/.openclaw/workspace/HEARTBEAT.md`
 - `/mnt/openclaw/.openclaw/workspace/MEMORY.md` (optional)
 
-This template does not use `shared_instructions.md` by default.
-
 ## Runtime Defaults
 
 - `OPENCLAW_HOME=/mnt/openclaw`
