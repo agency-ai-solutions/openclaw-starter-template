@@ -45,7 +45,11 @@ def _apply_openclaw_config_overrides() -> None:
                     continue
                 os.environ[key] = str(value)
 
-    proxy_api_key = os.getenv("APP_TOKEN") or os.getenv("OPENCLAW_GATEWAY_TOKEN")
+    # The local proxy is protected by APP_TOKEN. Gateway token is only a fallback
+    # for setups where APP_TOKEN is intentionally unset.
+    proxy_api_key = os.getenv("APP_TOKEN")
+    if not proxy_api_key:
+        proxy_api_key = os.getenv("OPENCLAW_GATEWAY_TOKEN")
     if proxy_api_key:
         os.environ.setdefault("OPENCLAW_PROXY_API_KEY", proxy_api_key)
 

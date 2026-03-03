@@ -20,7 +20,9 @@ ENV PYTHONUNBUFFERED=1 \
     OPENCLAW_DEFAULT_MODEL=openclaw:main \
     OPENCLAW_PROVIDER_MODEL=openai/gpt-5-mini
 
-COPY --from=openclaw-runtime /usr/local/ /usr/local/
+COPY --from=openclaw-runtime /usr/local/bin/node /usr/local/bin/node
+COPY --from=openclaw-runtime /usr/local/bin/openclaw /usr/local/bin/openclaw
+COPY --from=openclaw-runtime /usr/local/lib/node_modules/openclaw /usr/local/lib/node_modules/openclaw
 
 WORKDIR /app
 

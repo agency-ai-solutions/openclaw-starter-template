@@ -49,6 +49,7 @@ Running `python onboarding_tool.py` writes `onboarding_config.py`.
 
 - The OpenClaw agent instructions come from the onboarding field `agent_instructions`.
 - This template does not apply agency-level shared instructions by default.
+- Proxy authentication uses `APP_TOKEN` by default; `OPENCLAW_GATEWAY_TOKEN` is a fallback when `APP_TOKEN` is unset.
 - To change behavior, update `agent_instructions` in onboarding or edit `agency.py`.
 
 ## Deterministic build policy
