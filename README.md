@@ -83,6 +83,11 @@ pip install -r requirements.txt
 python main.py
 ```
 
+Local Node requirement:
+
+- OpenClaw requires Node `>=22.12.0`.
+- If you have multiple Node installs, set `OPENCLAW_NODE_BIN` to the compatible binary path (for example `/opt/homebrew/bin/node` on macOS).
+
 Local note: if your machine does not provide writable `/mnt`, set `OPENCLAW_HOME`, `OPENCLAW_STATE_DIR`, `OPENCLAW_CONFIG_PATH`, and `OPENCLAW_LOG_PATH` to a writable local path.
 
 Then call:
