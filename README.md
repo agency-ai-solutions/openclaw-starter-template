@@ -16,7 +16,7 @@ Deploy OpenClaw on Agencii in one click with Agency Swarm FastAPI endpoints unch
 ## One-click deploy flow (Agencii)
 
 1. Connect this repo in Agencii.
-2. Set provider keys in the Agencii key modal (BYOK), for example:
+2. Set provider keys in the Agencii key modal, for example:
    - `OPENAI_API_KEY`
    - `ANTHROPIC_API_KEY`
 3. Fill onboarding form fields.
@@ -68,11 +68,11 @@ Upgrade rule:
 
 ## Agency Swarm dependency pin
 
-`requirements.txt` is pinned to an Agency Swarm commit that includes OpenClaw integration APIs used by this template.
+`requirements.txt` is pinned to an immutable Agency Swarm commit that includes OpenClaw integration APIs used by this template.
 
 Upgrade rule:
 
-1. Move to an official Agency Swarm release once it includes `agency_swarm.integrations.openclaw`.
+1. Move to an official Agency Swarm release (or merged `main` SHA) once it includes `agency_swarm.integrations.openclaw`.
 2. Re-run template deploy smoke tests before publishing changes.
 
 ## Local run
