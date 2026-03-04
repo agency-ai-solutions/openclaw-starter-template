@@ -1,7 +1,6 @@
 # OpenClaw Starter Template for Agencii
 
 Deploy your own private OpenClaw assistant on [Agencii](https://agencii.ai/) in a few clicks.
-You can sign in with your regular ChatGPT account using Codex OAuth, so API keys are optional.
 
 **🌐 [Agencii](https://agencii.ai/)** - Cloud platform for deploying and hosting AI agents
 **🔗 [GitHub App](https://github.com/apps/agencii)** - Connect your repo for automated deployments
@@ -24,15 +23,7 @@ Create your own repository from this template:
 - Connect your GitHub account
 - Select the repository created from this template
 
-### 3. Choose your auth path
-
-Recommended path (keyless):
-
-- Use your ChatGPT account with OpenClaw Codex OAuth in Step 6
-- No OpenAI API key is required for this path
-- OpenClaw Codex auth supports more than Codex-only models (for example `gpt-5.2`)
-
-Optional path (API keys):
+### 3. Add provider keys
 
 - Add provider keys in the Agencii key modal (`OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, etc.)
 - For local development, you can copy `.env.template` to `.env` and set keys there
@@ -46,24 +37,8 @@ Use the onboarding form in Agencii to set your agent name, description, and inst
 ### 5. Deploy
 
 - Start deployment in Agencii and wait for build completion
-- Open deployment shell access for the running sandbox
 
-### 6. Run one-time OpenClaw OAuth bootstrap
-
-Run this in the same deployed sandbox where `main.py` runs:
-
-```bash
-openclaw models auth login --provider openai-codex
-```
-
-Expected flow (about 1 minute):
-
-1. Command prints an auth URL.
-2. Open URL in your local browser and sign in.
-3. Paste redirect URL/code back into the shell prompt.
-4. OpenClaw writes auth profile files under `/mnt/openclaw/state/...`.
-
-### 7. Verify
+### 6. Verify
 
 After deploy, verify health:
 
@@ -138,7 +113,7 @@ If you prefer manual setup, update:
 - `OPENCLAW_PROVIDER_MODEL` (set via onboarding override or environment)
 
 `openclaw:main` is the stable external model id used by Agency Swarm routes.  
-This template's onboarding default overrides the provider model to `openai-codex/gpt-5.2` for Codex OAuth flow.
+This template's onboarding default sets `OPENCLAW_PROVIDER_MODEL` to `openai/gpt-5.2`.
 
 ---
 
@@ -165,11 +140,11 @@ If responses feel off, check both onboarding config and workspace files.
 
 ## 🚀 Production Deployment With Agencii
 
-### Step 1: Connect repo + auth path
+### Step 1: Connect repo
 
 - Use template to create repo
 - Connect repo in Agencii
-- Use ChatGPT OAuth (recommended) or set provider keys in Agencii key modal
+- Set provider keys in Agencii key modal
 
 ### Step 2: Deploy
 
@@ -220,7 +195,6 @@ docker run --rm -p 8080:8080 \
 ## 📚 Key Features
 
 - **Deploy in a few clicks** on Agencii with starter template
-- **Keyless ChatGPT sign-in** with OpenClaw Codex OAuth
 - **OpenClaw + Agency Swarm integration** under one FastAPI app
 - **Open Responses compatibility** through `/openclaw/v1/responses`
 - **Persistent runtime state** under `/mnt/openclaw`
