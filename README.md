@@ -1,207 +1,256 @@
-# Agency Swarm GitHub Template
+# OpenClaw Starter Template for Agencii
 
-A production-ready template for deploying [Agency Swarm](https://github.com/VRSEN/agency-swarm) agencies with Docker containerization and automated deployment to the [Agencii](https://agencii.ai/) cloud platform.
+A production-ready template for deploying a private OpenClaw assistant on [Agencii](https://agencii.ai/) with Agency Swarm FastAPI.
+Deploy in a few clicks using the template + Agencii GitHub integration.
 
-**🌐 [Agencii](https://agencii.ai/)** - The official cloud platform for Agency Swarm deployments  
-**🔗 [GitHub App](https://github.com/apps/agencii)** - Automated deployment integration
+**🌐 [Agencii](https://agencii.ai/)** - Cloud platform for deploying and hosting AI agents
+**🔗 [GitHub App](https://github.com/apps/agencii)** - Connect your repo for automated deployments
 
 ---
 
 ## 🚀 Quick Start
 
-### 1. Use This Template
+### 1. Use this template
 
-Click **"Use this template"** to create your own repository, or:
+Create your own repository from this template:
+
+- Open [agency-ai-solutions/openclaw-starter-template](https://github.com/agency-ai-solutions/openclaw-starter-template)
+- Click **Use this template**
+- Create a repository in your own GitHub account/org
+
+### 2. Connect the repository in Agencii
+
+- Sign in to [agencii.ai](https://agencii.ai/)
+- Connect your GitHub account
+- Select the repository created from this template
+
+### 3. Add model provider keys
+
+Add keys in the Agencii key modal (for example):
+
+- `OPENAI_API_KEY`
+- `ANTHROPIC_API_KEY`
+
+For local development, you can copy `.env.template` to `.env` and set keys there.
+
+### 4. Fill the onboarding form
+
+The onboarding form writes `onboarding_config.py` with these fields:
+
+1. `agent_name`
+2. `agent_description`
+3. `openclaw_model` (default `openclaw:main`)
+4. `agent_instructions` (optional)
+5. `openclaw_config_overrides_json` (optional JSON object with `OPENCLAW_*` overrides)
+
+### 5. Deploy and verify
+
+After deploy, verify health:
 
 ```bash
-git clone https://github.com/your-username/agency-github-template.git
-cd agency-github-template
+curl -H "Authorization: Bearer <APP_TOKEN>" https://<your-deployed-domain>/openclaw/health
 ```
 
-> **🌐 For Production**: Sign up at [agencii.ai](https://agencii.ai/) and use this template for automated cloud deployment
+Use the deployment URL shown in Agencii. If your deployment requires auth, use the same `APP_TOKEN` configured for the app.
 
-### 2. Install Dependencies
+Expected endpoints include:
 
-```bash
-pip install -r requirements.txt
-```
-
-### 3. Set Up Environment Variables
-
-Create a `.env` file in the root directory:
-
-```bash
-# Required
-OPENAI_API_KEY=your_openai_api_key_here
-
-# Optional - Add any additional API keys your agents need
-# EXAMPLE_API_KEY=your_api_key_here
-```
-
-### 4. Test the Example Agency
-
-```bash
-python agency.py
-```
-
-This runs the example agency in terminal mode for testing.
-
-> **💡 Pro Tip**: For creating your own agency, open this template in [Cursor IDE](https://cursor.sh/) and use the AI assistant with the `.cursor/rules/workflow.mdc` file for automated agency creation!
+- `POST /openclaw/v1/responses`
+- `GET /openclaw/health`
+- `POST /openclaw/get_response_stream`
+- `POST /openclaw/cancel_response_stream`
 
 ---
 
 ## 🏗️ Project Structure
 
-```
-agency-github-template/
-├── agency.py                 # Main entry point
-├── requirements.txt          # Python dependencies
-├── Dockerfile               # Container configuration
-├── .env                     # Environment variables (create this)
-├── example_agent/           # Your agency folder
-    ├── __init__.py
-    ├── example_agent.py
-    ├── instructions.md
-    ├── files/               # Local files accessible to the agent (via files_folder)
-    └── tools/
-        └── ExampleTool.py
-├── example_agent2/
-├── agency_manifesto.md  # Shared instructions
-├── requirements.txt
-├── .env
-└──...
+```text
+openclaw-starter-template/
+├── main.py                         # FastAPI app entry point
+├── agency.py                       # Public agency factory (create_agency)
+├── openclaw_template_helpers.py    # Template config + OpenClaw model wiring
+├── onboarding_tool.py              # Marketplace onboarding schema/writer
+├── onboarding_config.py            # Generated onboarding values
+├── .cursor/rules/workflow.mdc      # Cursor workflow guidance
+├── Dockerfile                      # Pinned runtime versions
+├── requirements.txt                # Python dependencies
+└── README.md
 ```
 
 ---
 
-## 🔧 Creating Your Own Agency
+## 🔧 Creating Your OpenClaw Agency
 
-### 🤖 **AI-Assisted Agency Creation with Cursor**
+### 🤖 AI-Assisted Setup With Cursor
 
-This template includes **AI-powered agency creation** using Cursor IDE:
+This template keeps the Cursor workflow files so you can safely customize behavior:
 
-1. **Open this project in Cursor IDE**
+1. Open the repository in Cursor
+2. Reference `.cursor/rules/workflow.mdc`
+3. Ask Cursor to customize this OpenClaw template (agent name, instructions, tools, UX copy)
 
-2. **Use the AI Assistant** to create your agency by referencing:
-   ```
-   📁 .cursor/rules/workflow.mdc
-   ```
-3. **Simply ask the AI:**
+### 🛠️ Manual Setup
 
-   > "Create a new agency using the .cursor workflow"
+If you prefer manual setup, update:
 
-   The AI will guide you through the complete 7-step process:
-
-   - ✅ PRD Creation
-   - ✅ Folder Structure Setup
-   - ✅ Tool Development
-   - ✅ Agent Creation
-   - ✅ Agency Configuration
-   - ✅ Testing & Validation
-   - ✅ Iteration & Refinement
-
-### 📋 **What the AI Will Do For You**
-
-The AI assistant will automatically:
-
-- Create proper folder structures
-- Generate agent classes and instructions
-- Build custom tools with full functionality
-- Set up communication flows
-- Create the main agency file
-- Test everything to ensure it works
-
-### 🚀 **Manual Alternative (Advanced Users)**
-
-If you prefer manual setup, replace the `ExampleAgency/` folder with your own agency structure following the Agency Swarm conventions.
-
-### Agency Structure Requirements
-
-Your agency must follow this structure:
-
-- **Agency Folder**: Contains all agents and manifesto
-- **Agent Folders**: Each agent has its own folder with:
-  - `AgentName.py` - Agent class definition
-  - `instructions.md` - Agent-specific instructions
-  - `tools/` - Folder containing agent tools
-- **agency_manifesto.md** - Shared instructions for all agents
+- `onboarding_tool.py` (fields shown in marketplace onboarding)
+- `openclaw_template_helpers.py` (how onboarding maps to runtime)
+- `agency.py` (agency composition)
 
 ---
 
-## 🚀 Production Deployment with Agencii
+## ⚙️ How This Template Works
 
-### **🌐 Deploy to Agencii Cloud Platform**
+- `main.py` starts standard Agency Swarm FastAPI routes via `run_fastapi(...)`
+- `attach_openclaw_to_fastapi(...)` mounts OpenClaw proxy routes at `/openclaw/*`
+- Agency requests use model id `openclaw:main`
+- Proxy forwards to OpenClaw gateway (`127.0.0.1:18789`) with Open Responses compatibility
+- OpenClaw state persists under `/mnt/openclaw` in deployed environments
 
-For production deployment, use the [Agencii](https://agencii.ai/) platform:
+### Runtime defaults
 
-#### **Step 1: Create Account & Use Template**
+- `OPENCLAW_HOME=/mnt/openclaw`
+- `OPENCLAW_STATE_DIR=/mnt/openclaw/state`
+- `OPENCLAW_CONFIG_PATH=/mnt/openclaw/openclaw.json`
+- `OPENCLAW_LOG_PATH=/mnt/openclaw/logs/openclaw-gateway.log`
+- `OPENCLAW_PORT=18789`
+- `OPENCLAW_DEFAULT_MODEL=openclaw:main`
+- `OPENCLAW_PROVIDER_MODEL=openai/gpt-5-mini`
 
-1. **Sign up** at [agencii.ai](https://agencii.ai/)
-2. **Use this template** to create your repository
-3. **Develop your agency** using Cursor IDE with `.cursor` workflow
+`openclaw:main` is the stable external model id used by Agency Swarm routes. The actual upstream provider model is controlled by `OPENCLAW_PROVIDER_MODEL`.
 
-#### **Step 2: Install GitHub App**
+---
 
-1. **Install** the [Agencii GitHub App](https://github.com/apps/agencii)
-2. **Grant permissions** to your repository
-3. **Configure** environment variables in Agencii dashboard
+## 🧠 Instruction Sources (Important)
 
-#### **Step 3: Deploy**
+Behavior can come from two places:
 
-1. **Push to main branch** - Agencii automatically detects and deploys
-2. **Monitor deployment** in your Agencii dashboard
-3. **Access your live agency** via provided endpoints
+1. Onboarding instructions (`agent_instructions`)
+2. OpenClaw workspace files on persistent storage
 
-### **🔄 Automatic Deployments**
+Common OpenClaw workspace files:
 
-- **Auto-deploy** on every push to `main` branch
-- **Zero-downtime** deployments with rollback capability
-- **Environment management** through Agencii dashboard
+- `/mnt/openclaw/.openclaw/workspace/AGENTS.md`
+- `/mnt/openclaw/.openclaw/workspace/SOUL.md`
+- `/mnt/openclaw/.openclaw/workspace/USER.md`
+- `/mnt/openclaw/.openclaw/workspace/IDENTITY.md`
+- `/mnt/openclaw/.openclaw/workspace/TOOLS.md`
+- `/mnt/openclaw/.openclaw/workspace/HEARTBEAT.md`
+- `/mnt/openclaw/.openclaw/workspace/MEMORY.md` (optional)
+
+If responses feel off, check both onboarding config and workspace files.
+
+---
+
+## 🚀 Production Deployment With Agencii
+
+### Step 1: Connect repo + keys
+
+- Use template to create repo
+- Connect repo in Agencii
+- Set provider keys in Agencii key modal
+
+### Step 2: Deploy
+
+- Start deployment from Agencii
+- Wait for build completion
+- Open your deployed chat UI and run first prompt
+
+### Step 3: Validate
+
+- Verify `/openclaw/health`
+- Verify chat streaming in your Agencii UI
 
 ---
 
 ## 🔨 Development Workflow
 
-### **🎯 Recommended: AI-Assisted Development**
+### Local development (FastAPI path)
 
-1. **Open Cursor IDE** with this template
-2. **Ask the AI**: _"Create a new agency using the .cursor workflow"_
-3. **Follow the guided process** - the AI handles everything automatically
-4. **Test your agency**: `python agency.py`
-5. **Deploy to production**: Install [Agencii GitHub App](https://github.com/apps/agencii) and push to main
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+cp .env.template .env
+python main.py
+```
 
-### **⚙️ Manual Development (Advanced)**
+Then run:
 
-If you prefer hands-on development:
+```bash
+curl -H "Authorization: Bearer $APP_TOKEN" http://127.0.0.1:8080/openclaw/health
+```
 
-1. **Create Tools**: Build agent tools in `tools/` folders
-2. **Configure Agents**: Write `instructions.md` and agent classes
-3. **Test Locally**: Run `python agency.py`
-4. **Deploy**: Push to your preferred platform
+Note: local runtime requires OpenClaw + compatible Node available on your machine (or run via Docker).
 
-The `.cursor/rules/workflow.mdc` file contains the complete development specifications for manual implementation.
+### Docker local run (closest to production image)
+
+```bash
+docker build -t openclaw-template .
+docker run --rm -p 8080:8080 \
+  -e APP_TOKEN=local-token \
+  -e OPENAI_API_KEY=your_key \
+  -v "$PWD/.data:/mnt" \
+  openclaw-template
+```
 
 ---
 
 ## 📚 Key Features
 
-- **🌐 Agencii Cloud Deploy**: One-click deployment to [Agencii platform](https://agencii.ai/)
-- **🤖 AI-Assisted Creation**: Built-in Cursor IDE workflow for automated agency development
-- **🔄 Auto-Deploy**: Automatic deployment on push to main branch
-- **🚀 Ready-to-Deploy**: Dockerfile and requirements included
-- **🔧 Modular Structure**: Easy to customize and extend
-- **🛠️ Example Implementation**: Complete working example
-- **📦 Container Ready**: Docker configuration for any platform
-- **🔒 Environment Management**: Secure API key handling via Agencii dashboard
-- **🧪 Local Testing**: Terminal demo for development
-- **📋 Guided Workflow**: 7-step process with AI assistance
+- **Deploy in a few clicks** on Agencii with starter template
+- **OpenClaw + Agency Swarm integration** under one FastAPI app
+- **Open Responses compatibility** through `/openclaw/v1/responses`
+- **Persistent runtime state** under `/mnt/openclaw`
+- **Onboarding-driven customization** without editing core runtime code
+- **Pinned runtime versions** in Dockerfile for deterministic builds
+
+---
+
+## 🔐 Security Notes
+
+- This deployment is intended to be a private OpenClaw instance.
+- Provider API keys are injected into runtime env so OpenClaw can call provider APIs.
+- Do not share one instance across untrusted users.
+
+OpenClaw references:
+
+- [OpenClaw Security Policy](https://github.com/openclaw/openclaw/blob/main/SECURITY.md)
+- [OpenClaw Trust Center](https://trust.openclaw.ai)
+
+---
+
+## 📦 Version Pinning And Upgrades
+
+Pinned build args in `Dockerfile`:
+
+- `PYTHON_VERSION=3.13.2`
+- `NODE_VERSION=22.14.0`
+- `OPENCLAW_VERSION=2026.3.2`
+
+Upgrade policy:
+
+1. Bump versions intentionally (no auto-float)
+2. Rebuild image
+3. Run local smoke tests + stream checks
+4. Promote only after verification
 
 ---
 
 ## 📖 Learn More
 
-- **[Agency Swarm Documentation](https://agency-swarm.ai/)**
-- **[Agency Swarm GitHub](https://github.com/VRSEN/agency-swarm)**
+- [Agency Swarm](https://github.com/VRSEN/agency-swarm)
+- [OpenClaw Docs](https://docs.openclaw.ai/)
+- [Agencii Platform](https://agencii.ai/)
+
+---
+
+## ⚡ Quick Tips
+
+- Start with default onboarding fields; customize only after first successful deploy.
+- Keep `openclaw:main` as external model id unless you know downstream impact.
+- Put stable persona rules in OpenClaw workspace files (`AGENTS.md`, `SOUL.md`).
+- Use Agencii key modal as source of truth for provider credentials.
 
 ---
 
@@ -214,27 +263,25 @@ The `.cursor/rules/workflow.mdc` file contains the complete development specific
 
 ---
 
-## ⚡ Quick Tips
+### 🌐 Production Route (Recommended)
 
-- **Start Small**: Begin with 1-2 agents and expand
-- **Test Tools**: Each tool should work independently
-- **Clear Instructions**: Write detailed agent instructions
-- **Environment Setup**: Always use `.env` for API keys
-- **Documentation**: Update instructions as you develop
+1. Use this template to create your repository
+2. Connect the repository in Agencii
+3. Install the [Agencii GitHub App](https://github.com/apps/agencii)
+4. Configure keys in Agencii and deploy
+
+### 🛠️ Development Route
+
+1. Run locally with `python main.py`
+2. Validate `/openclaw/health` and streaming endpoints
+3. Push to your repo and deploy through Agencii
 
 ---
 
-**Ready to build your AI agency?** 🤖✨
+## Notes on Agency Swarm dependency
 
-### 🌐 **Production Route (Recommended)**
+This template currently installs `agency-swarm` from the integration branch:
 
-1. **Sign up** at [agencii.ai](https://agencii.ai/)
-2. **Use this template** to create your repository
-3. **Install** [Agencii GitHub App](https://github.com/apps/agencii)
-4. **Push to main** → Automatic deployment!
+- `agency-swarm[fastapi] @ git+https://github.com/VRSEN/agency-swarm.git@codex/openclaw-agencii-v1`
 
-### 🛠️ **Development Route**
-
-Open this template in **Cursor IDE** and ask the AI to create your agency using the `.cursor` workflow. The AI will handle everything from setup to testing automatically!
-
-For manual development, replace the `ExampleAgency` with your own implementation and start deploying intelligent agent systems!
+Move to an official release tag once OpenClaw integration APIs are published to `main`/PyPI.

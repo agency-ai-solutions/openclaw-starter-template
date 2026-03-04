@@ -1,11 +1,11 @@
 # only listed properties are used by the system
 
 [project]
-name = "my-agency"
-description = "My awesome agency"
-version = "0.0.1"
+name = "openclaw-starter-template"
+description = "One-click OpenClaw deployment template for Agencii"
+version = "0.1.0"
 license = { text = "MIT" }
-keywords = ["agency-swarm", "agencii"]
+keywords = ["agency-swarm", "agencii", "openclaw"]
 
 [tool.template]
-version = "0.0.2"
+version = "0.1.0"

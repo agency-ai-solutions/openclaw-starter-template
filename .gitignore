@@ -1,5 +1,6 @@
 # Agency Swarm
 .agency_swarm_chats/
+.agency_swarm/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

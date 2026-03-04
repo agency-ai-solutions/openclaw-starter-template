@@ -1,3 +1,2 @@
-agency-swarm[fastapi]>=1.2.1
-fastapi
-uvicorn
+agency-swarm[fastapi] @ git+https://github.com/VRSEN/agency-swarm.git@codex/openclaw-agencii-v1
+python-dotenv==1.1.1
