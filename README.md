@@ -1,6 +1,7 @@
 # OpenClaw Starter Template for Agencii
 
 A production-ready template for deploying a private OpenClaw assistant on [Agencii](https://agencii.ai/) with Agency Swarm FastAPI.
+Deploy in a few clicks using the template + Agencii GitHub integration.
 
 **🌐 [Agencii](https://agencii.ai/)** - Cloud platform for deploying and hosting AI agents
 **🔗 [GitHub App](https://github.com/apps/agencii)** - Connect your repo for automated deployments
@@ -195,7 +196,7 @@ docker run --rm -p 8080:8080 \
 
 ## 📚 Key Features
 
-- **Few-click deployment** on Agencii with starter template
+- **Deploy in a few clicks** on Agencii with starter template
 - **OpenClaw + Agency Swarm integration** under one FastAPI app
 - **Open Responses compatibility** through `/openclaw/v1/responses`
 - **Persistent runtime state** under `/mnt/openclaw`
@@ -248,6 +249,30 @@ Upgrade policy:
 - Keep `openclaw:main` as external model id unless you know downstream impact.
 - Put stable persona rules in OpenClaw workspace files (`AGENTS.md`, `SOUL.md`).
 - Use Agencii key modal as source of truth for provider credentials.
+
+---
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Submit a pull request
+
+---
+
+### 🌐 Production Route (Recommended)
+
+1. Use this template to create your repository
+2. Connect the repository in Agencii
+3. Install the [Agencii GitHub App](https://github.com/apps/agencii)
+4. Configure keys in Agencii and deploy
+
+### 🛠️ Development Route
+
+1. Run locally with `python main.py`
+2. Validate `/openclaw/health` and streaming endpoints
+3. Push to your repo and deploy through Agencii
 
 ---
 
