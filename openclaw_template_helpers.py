@@ -17,7 +17,7 @@ _DEFAULT_ONBOARDING_CONFIG: dict[str, str] = {
     "agent_description": "Agent powered by an OpenClaw Responses backend.",
     "openclaw_model": "openclaw:main",
     "agent_instructions": "Handle user tasks and call tools when needed.",
-    "openclaw_config_overrides_json": "",
+    "openclaw_config_overrides_json": '{"OPENCLAW_PROVIDER_MODEL":"openai-codex/gpt-5.3-codex"}',
 }
 
 try:

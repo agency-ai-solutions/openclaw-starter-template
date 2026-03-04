@@ -24,7 +24,7 @@ Create your own repository from this template:
 - Connect your GitHub account
 - Select the repository created from this template
 
-### 3. Add model provider keys
+### 3. Add credentials in Agencii
 
 Add keys in the Agencii key modal (for example):
 
@@ -32,6 +32,7 @@ Add keys in the Agencii key modal (for example):
 - `ANTHROPIC_API_KEY`
 
 For local development, you can copy `.env.template` to `.env` and set keys there.
+The default onboarding setup in this template uses OpenClaw Codex OAuth (next steps below).
 
 ### 4. Fill the onboarding form
 
@@ -43,7 +44,33 @@ The onboarding form writes `onboarding_config.py` with these fields:
 4. `agent_instructions` (optional)
 5. `openclaw_config_overrides_json` (optional JSON object with `OPENCLAW_*` overrides)
 
-### 5. Deploy and verify
+Default value for `openclaw_config_overrides_json`:
+
+```json
+{"OPENCLAW_PROVIDER_MODEL":"openai-codex/gpt-5.3-codex"}
+```
+
+### 5. Deploy
+
+- Start deployment in Agencii and wait for build completion
+- Open deployment shell access for the running sandbox
+
+### 6. Run one-time OpenClaw OAuth bootstrap
+
+Run this in the same deployed sandbox where `main.py` runs:
+
+```bash
+openclaw models auth login --provider openai-codex
+```
+
+Expected flow:
+
+1. Command prints an auth URL.
+2. Open URL in your local browser and sign in.
+3. Paste redirect URL/code back into the shell prompt.
+4. OpenClaw writes auth profile files under `/mnt/openclaw/state/...`.
+
+### 7. Verify
 
 After deploy, verify health:
 
@@ -115,9 +142,10 @@ If you prefer manual setup, update:
 - `OPENCLAW_LOG_PATH=/mnt/openclaw/logs/openclaw-gateway.log`
 - `OPENCLAW_PORT=18789`
 - `OPENCLAW_DEFAULT_MODEL=openclaw:main`
-- `OPENCLAW_PROVIDER_MODEL=openai/gpt-5-mini`
+- `OPENCLAW_PROVIDER_MODEL=openai/gpt-5-mini` (base fallback in image)
 
-`openclaw:main` is the stable external model id used by Agency Swarm routes. The actual upstream provider model is controlled by `OPENCLAW_PROVIDER_MODEL`.
+`openclaw:main` is the stable external model id used by Agency Swarm routes.  
+This template's onboarding default overrides the provider model to `openai-codex/gpt-5.3-codex` for Codex OAuth flow.
 
 ---
 
@@ -160,6 +188,27 @@ If responses feel off, check both onboarding config and workspace files.
 
 - Verify `/openclaw/health`
 - Verify chat streaming in your Agencii UI
+
+---
+
+## 🔑 Manual OpenClaw OAuth Bootstrap (Setup-Time)
+
+Use this flow when your provider model is `openai-codex/gpt-5.3-codex`.
+
+Run in deployment shell:
+
+```bash
+openclaw models auth login --provider openai-codex
+```
+
+Then verify:
+
+```bash
+cat /mnt/openclaw/state/agents/main/agent/auth-profiles.json
+openclaw models status
+```
+
+If you use local dev paths (`/tmp/openclaw-local`), check the same relative file inside that state directory.
 
 ---
 
