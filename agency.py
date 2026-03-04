@@ -16,7 +16,3 @@ def create_agency(load_threads_callback=None):
         name="OpenClawAgency",
         load_threads_callback=load_threads_callback,
     )
-
-
-if __name__ == "__main__":
-    create_agency().terminal_demo()

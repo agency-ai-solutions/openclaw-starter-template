@@ -48,8 +48,10 @@ The onboarding form writes `onboarding_config.py` with these fields:
 After deploy, verify health:
 
 ```bash
-curl -H "Authorization: Bearer $APP_TOKEN" http://127.0.0.1:8080/openclaw/health
+curl -H "Authorization: Bearer <APP_TOKEN>" https://<your-deployed-domain>/openclaw/health
 ```
+
+Use the deployment URL shown in Agencii. If your deployment requires auth, use the same `APP_TOKEN` configured for the app.
 
 Expected endpoints include:
 
