@@ -135,10 +135,10 @@ If you prefer manual setup, update:
 - `OPENCLAW_LOG_PATH=/mnt/openclaw/logs/openclaw-gateway.log`
 - `OPENCLAW_PORT=18789`
 - `OPENCLAW_DEFAULT_MODEL=openclaw:main`
-- `OPENCLAW_PROVIDER_MODEL=openai/gpt-5-mini` (base fallback in image)
+- `OPENCLAW_PROVIDER_MODEL` (set via onboarding override or environment)
 
 `openclaw:main` is the stable external model id used by Agency Swarm routes.  
-This template's onboarding default overrides the provider model to `openai-codex/gpt-5.3-codex` for Codex OAuth flow.
+This template's onboarding default overrides the provider model to `openai-codex/gpt-5.2` for Codex OAuth flow.
 
 ---
 
