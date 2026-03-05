@@ -25,12 +25,19 @@ Create your own repository from this template:
 
 ### 3. Add provider keys
 
-- Add provider keys in the Agencii key modal (`OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, etc.)
+- Add provider keys in Agencii Secrets Vault (`OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, etc.)
 - For local development, you can copy `.env.template` to `.env` and set keys there
 
 ### 4. Fill the onboarding form
 
-Use the onboarding form in Agencii to set your agent name, description, and instructions.
+Use the onboarding form in Agencii to define your assistant:
+
+- Name shown in chat
+- Short description of what it should do
+- Main instructions for how it should behave
+
+You can also set optional advanced OpenClaw runtime overrides.
+Do not put API keys in onboarding fields.
 
 ![Marketplace onboarding form example](https://raw.githubusercontent.com/VRSEN/agency-swarm/main/docs/images/platform/onboarding_form.png)
 
@@ -98,7 +105,6 @@ If you prefer manual setup, update:
 
 - `main.py` starts standard Agency Swarm FastAPI routes via `run_fastapi(...)`
 - `attach_openclaw_to_fastapi(...)` mounts OpenClaw proxy routes at `/openclaw/*`
-- Agency requests use model id `openclaw:main`
 - Proxy forwards to OpenClaw gateway (`127.0.0.1:18789`) with Open Responses compatibility
 - OpenClaw state persists under `/mnt/openclaw` in deployed environments
 
@@ -109,11 +115,17 @@ If you prefer manual setup, update:
 - `OPENCLAW_CONFIG_PATH=/mnt/openclaw/openclaw.json`
 - `OPENCLAW_LOG_PATH=/mnt/openclaw/logs/openclaw-gateway.log`
 - `OPENCLAW_PORT=18789`
-- `OPENCLAW_DEFAULT_MODEL=openclaw:main`
 - `OPENCLAW_PROVIDER_MODEL` (set via onboarding override or environment)
 
-`openclaw:main` is the stable external model id used by Agency Swarm routes.  
 This template's onboarding default sets `OPENCLAW_PROVIDER_MODEL` to `openai/gpt-5.2`.
+
+### Configuration source of truth
+
+- Onboarding form sets your assistant identity and core instructions.
+- OpenClaw workspace files under `/mnt/openclaw/.openclaw/workspace` (`AGENTS.md`, `SOUL.md`, etc.) are also read by OpenClaw.
+- These two instruction sources are combined. They do not automatically replace each other.
+- If they conflict, behavior can feel inconsistent, so keep them aligned.
+- For `OPENCLAW_*` settings, explicit environment values win over onboarding defaults.
 
 ---
 
@@ -121,7 +133,7 @@ This template's onboarding default sets `OPENCLAW_PROVIDER_MODEL` to `openai/gpt
 
 Behavior can come from two places:
 
-1. Onboarding instructions (`agent_instructions`)
+1. Onboarding instructions
 2. OpenClaw workspace files on persistent storage
 
 Common OpenClaw workspace files:
@@ -144,7 +156,7 @@ If responses feel off, check both onboarding config and workspace files.
 
 - Use template to create repo
 - Connect repo in Agencii
-- Set provider keys in Agencii key modal
+- Set provider keys in Agencii Secrets Vault
 
 ### Step 2: Deploy
 
@@ -244,9 +256,8 @@ Upgrade policy:
 ## ⚡ Quick Tips
 
 - Start with default onboarding fields; customize only after first successful deploy.
-- Keep `openclaw:main` as external model id unless you know downstream impact.
 - Put stable persona rules in OpenClaw workspace files (`AGENTS.md`, `SOUL.md`).
-- Use Agencii key modal as source of truth for provider credentials.
+- Use Agencii Secrets Vault as source of truth for provider credentials.
 
 ---
 
@@ -256,21 +267,6 @@ Upgrade policy:
 2. Create a feature branch
 3. Make your changes
 4. Submit a pull request
-
----
-
-### 🌐 Production Route (Recommended)
-
-1. Use this template to create your repository
-2. Connect the repository in Agencii
-3. Install the [Agencii GitHub App](https://github.com/apps/agencii)
-4. Configure keys in Agencii and deploy
-
-### 🛠️ Development Route
-
-1. Run locally with `python main.py`
-2. Validate `/openclaw/health` and streaming endpoints
-3. Push to your repo and deploy through Agencii
 
 ---
 
