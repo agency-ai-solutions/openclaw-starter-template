@@ -26,7 +26,7 @@ class OnboardingTool(BaseTool):
         json_schema_extra={"ui:widget": "textarea"},
     )
     openclaw_config_overrides_json: str | None = Field(
-        default=None,
+        default='{"OPENCLAW_PROVIDER_MODEL":"openai/gpt-5.2"}',
         description="Optional JSON object with OPENCLAW_* env overrides.",
         json_schema_extra={"ui:widget": "textarea"},
     )
@@ -53,6 +53,6 @@ if __name__ == "__main__":
         agent_description="Automates tasks through OpenClaw.",
         openclaw_model="openclaw:main",
         agent_instructions="",
-        openclaw_config_overrides_json="",
+        openclaw_config_overrides_json='{"OPENCLAW_PROVIDER_MODEL":"openai/gpt-5.2"}',
     )
     print(tool.run())

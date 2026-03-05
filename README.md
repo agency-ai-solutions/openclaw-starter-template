@@ -1,7 +1,6 @@
 # OpenClaw Starter Template for Agencii
 
-A production-ready template for deploying a private OpenClaw assistant on [Agencii](https://agencii.ai/) with Agency Swarm FastAPI.
-Deploy in a few clicks using the template + Agencii GitHub integration.
+Deploy your own private OpenClaw assistant on [Agencii](https://agencii.ai/) in a few clicks.
 
 **🌐 [Agencii](https://agencii.ai/)** - Cloud platform for deploying and hosting AI agents
 **🔗 [GitHub App](https://github.com/apps/agencii)** - Connect your repo for automated deployments
@@ -24,26 +23,22 @@ Create your own repository from this template:
 - Connect your GitHub account
 - Select the repository created from this template
 
-### 3. Add model provider keys
+### 3. Add provider keys
 
-Add keys in the Agencii key modal (for example):
-
-- `OPENAI_API_KEY`
-- `ANTHROPIC_API_KEY`
-
-For local development, you can copy `.env.template` to `.env` and set keys there.
+- Add provider keys in the Agencii key modal (`OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, etc.)
+- For local development, you can copy `.env.template` to `.env` and set keys there
 
 ### 4. Fill the onboarding form
 
-The onboarding form writes `onboarding_config.py` with these fields:
+Use the onboarding form in Agencii to set your agent name, description, and instructions.
 
-1. `agent_name`
-2. `agent_description`
-3. `openclaw_model` (default `openclaw:main`)
-4. `agent_instructions` (optional)
-5. `openclaw_config_overrides_json` (optional JSON object with `OPENCLAW_*` overrides)
+![Marketplace onboarding form example](https://raw.githubusercontent.com/VRSEN/agency-swarm/main/docs/images/platform/onboarding_form.png)
 
-### 5. Deploy and verify
+### 5. Deploy
+
+- Start deployment in Agencii and wait for build completion
+
+### 6. Verify
 
 After deploy, verify health:
 
@@ -115,9 +110,10 @@ If you prefer manual setup, update:
 - `OPENCLAW_LOG_PATH=/mnt/openclaw/logs/openclaw-gateway.log`
 - `OPENCLAW_PORT=18789`
 - `OPENCLAW_DEFAULT_MODEL=openclaw:main`
-- `OPENCLAW_PROVIDER_MODEL=openai/gpt-5-mini`
+- `OPENCLAW_PROVIDER_MODEL` (set via onboarding override or environment)
 
-`openclaw:main` is the stable external model id used by Agency Swarm routes. The actual upstream provider model is controlled by `OPENCLAW_PROVIDER_MODEL`.
+`openclaw:main` is the stable external model id used by Agency Swarm routes.  
+This template's onboarding default sets `OPENCLAW_PROVIDER_MODEL` to `openai/gpt-5.2`.
 
 ---
 
@@ -144,7 +140,7 @@ If responses feel off, check both onboarding config and workspace files.
 
 ## 🚀 Production Deployment With Agencii
 
-### Step 1: Connect repo + keys
+### Step 1: Connect repo
 
 - Use template to create repo
 - Connect repo in Agencii

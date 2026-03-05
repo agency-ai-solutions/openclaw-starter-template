@@ -17,7 +17,7 @@ _DEFAULT_ONBOARDING_CONFIG: dict[str, str] = {
     "agent_description": "Agent powered by an OpenClaw Responses backend.",
     "openclaw_model": "openclaw:main",
     "agent_instructions": "Handle user tasks and call tools when needed.",
-    "openclaw_config_overrides_json": "",
+    "openclaw_config_overrides_json": '{"OPENCLAW_PROVIDER_MODEL":"openai/gpt-5.2"}',
 }
 
 try:
@@ -81,7 +81,8 @@ def _apply_openclaw_config_overrides() -> None:
     for key, value in overrides.items():
         if not isinstance(key, str) or not key.startswith("OPENCLAW_"):
             continue
-        os.environ[key] = _as_string(value)
+        # Explicit runtime environment settings win over onboarding defaults.
+        os.environ.setdefault(key, _as_string(value))
 
 
 def _ensure_proxy_api_key() -> None:
