@@ -10,24 +10,20 @@ from agency_swarm.tools import BaseTool
 
 load_dotenv()
 
+try:
+    from onboarding_config import config as existing_onboarding_config
+except ImportError:
+    existing_onboarding_config = {}
+
 
 class OnboardingTool(BaseTool):
     """Collect deployment settings for the OpenClaw marketplace template."""
 
-    agent_name: str = Field(..., description="Name of the OpenClaw agent shown to users.")
-    agent_description: str = Field(..., description="Short description of what this agent should do.")
-    openclaw_model: str = Field(
-        default="openclaw:main",
-        description="OpenClaw model id used by the agent.",
-    )
-    agent_instructions: str | None = Field(
+    assistant_name: str = Field(..., description="Name shown in chat.")
+    assistant_description: str = Field(..., description="What this assistant should help with.")
+    assistant_instructions: str | None = Field(
         default=None,
-        description="Optional extra instructions for the agent.",
-        json_schema_extra={"ui:widget": "textarea"},
-    )
-    openclaw_config_overrides_json: str | None = Field(
-        default='{"OPENCLAW_PROVIDER_MODEL":"openai/gpt-5.2"}',
-        description="Optional JSON object with OPENCLAW_* env overrides.",
+        description="Extra instructions you want to add before deploy.",
         json_schema_extra={"ui:widget": "textarea"},
     )
 
@@ -35,7 +31,8 @@ class OnboardingTool(BaseTool):
         tool_dir = os.path.dirname(os.path.abspath(__file__))
         config_path = os.path.join(tool_dir, "onboarding_config.py")
 
-        config = self.model_dump()
+        config = existing_onboarding_config.copy() if isinstance(existing_onboarding_config, dict) else {}
+        config.update(self.model_dump())
         python_code = (
             "# Auto-generated onboarding configuration\n\n"
             f"config = {pprint.pformat(config, sort_dicts=True)}\n"
@@ -49,10 +46,8 @@ class OnboardingTool(BaseTool):
 
 if __name__ == "__main__":
     tool = OnboardingTool(
-        agent_name="OpenClaw Agent",
-        agent_description="Automates tasks through OpenClaw.",
-        openclaw_model="openclaw:main",
-        agent_instructions="",
-        openclaw_config_overrides_json='{"OPENCLAW_PROVIDER_MODEL":"openai/gpt-5.2"}',
+        assistant_name="OpenClaw Assistant",
+        assistant_description="A private OpenClaw assistant running on Agencii.",
+        assistant_instructions="",
     )
     print(tool.run())
