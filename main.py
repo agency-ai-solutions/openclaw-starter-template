@@ -13,8 +13,10 @@ logging.basicConfig(level=logging.INFO)
 
 
 def create_app():
+    port = int(os.getenv("PORT", "8080"))
     app = run_fastapi(
         agencies={"openclaw": create_agency},
+        port=port,
         app_token_env="APP_TOKEN",
         return_app=True,
         enable_logging=True,

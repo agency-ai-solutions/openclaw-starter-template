@@ -1,2 +1,2 @@
-agency-swarm[fastapi] @ git+https://github.com/VRSEN/agency-swarm.git@codex/openclaw-agencii-v1
+agency-swarm[fastapi] @ git+https://github.com/VRSEN/agency-swarm.git@codex/openclaw-agent-worker
 python-dotenv==1.1.1

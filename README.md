@@ -2,10 +2,7 @@
 
 Deploy your own private OpenClaw assistant on [Agencii](https://agencii.ai/) in a few clicks.
 
-**🌐 [Agencii](https://agencii.ai/)** - Cloud platform for deploying and hosting AI agents
-**🔗 [GitHub App](https://github.com/apps/agencii)** - Connect your repo for automated deployments
-
----
+Use this repository when you want a ready OpenClaw deployment path, not a blank Agency Swarm project.
 
 ## 🚀 Quick Start
 
@@ -23,20 +20,23 @@ Create your own repository from this template:
 - Connect your GitHub account
 - Select the repository created from this template
 
-### 3. Add provider keys
+### 3. Add provider secrets
 
-- Add provider keys in Agencii Secrets Vault (`OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, etc.)
-- For local development, you can copy `.env.template` to `.env` and set keys there
+- Add provider secrets in Agencii Secrets Vault (`OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, etc.)
+- Add at least one provider key before deploy. You only need the key for the provider your chosen model uses
+- Set `OPENCLAW_PROVIDER_MODEL` as a normal deploy-time environment variable, not as a secret
+- If you switch to another provider, add that provider's env var too
+- Add `APP_TOKEN` too only if you want protected FastAPI routes
+- For local development, copy `.env.template` to `.env`, then fill in the provider key your chosen model needs before you start the app
 
 ### 4. Fill the onboarding form
 
 Use the onboarding form in Agencii to define your assistant:
 
 - Name shown in chat
-- Short description of what it should do
-- Main instructions for how it should behave
+- What it should help with
+- Extra instructions you want to add before deploy
 
-You can also set optional advanced OpenClaw runtime overrides.
 Do not put API keys in onboarding fields.
 
 ![Marketplace onboarding form example](https://raw.githubusercontent.com/VRSEN/agency-swarm/main/docs/images/platform/onboarding_form.png)
@@ -47,127 +47,54 @@ Do not put API keys in onboarding fields.
 
 ### 6. Verify
 
-After deploy, verify health:
+After deploy, open the chat and send your first message.
+If you want a quick health check too, call:
+
+```bash
+curl https://<your-deployed-domain>/openclaw/health
+```
+
+If your deployment uses `APP_TOKEN`, add the same bearer token to the request.
 
 ```bash
 curl -H "Authorization: Bearer <APP_TOKEN>" https://<your-deployed-domain>/openclaw/health
 ```
 
-Use the deployment URL shown in Agencii. If your deployment requires auth, use the same `APP_TOKEN` configured for the app.
+For the full platform walkthrough, see:
 
-Expected endpoints include:
-
-- `POST /openclaw/v1/responses`
-- `GET /openclaw/health`
-- `POST /openclaw/get_response_stream`
-- `POST /openclaw/cancel_response_stream`
-
----
-
-## 🏗️ Project Structure
-
-```text
-openclaw-starter-template/
-├── main.py                         # FastAPI app entry point
-├── agency.py                       # Public agency factory (create_agency)
-├── openclaw_template_helpers.py    # Template config + OpenClaw model wiring
-├── onboarding_tool.py              # Marketplace onboarding schema/writer
-├── onboarding_config.py            # Generated onboarding values
-├── .cursor/rules/workflow.mdc      # Cursor workflow guidance
-├── Dockerfile                      # Pinned runtime versions
-├── requirements.txt                # Python dependencies
-└── README.md
-```
-
----
-
-## 🔧 Creating Your OpenClaw Agency
-
-### 🤖 AI-Assisted Setup With Cursor
-
-This template keeps the Cursor workflow files so you can safely customize behavior:
-
-1. Open the repository in Cursor
-2. Reference `.cursor/rules/workflow.mdc`
-3. Ask Cursor to customize this OpenClaw template (agent name, instructions, tools, UX copy)
-
-### 🛠️ Manual Setup
-
-If you prefer manual setup, update:
-
-- `onboarding_tool.py` (fields shown in marketplace onboarding)
-- `openclaw_template_helpers.py` (how onboarding maps to runtime)
-- `agency.py` (agency composition)
-
----
+- [OpenClaw on Agencii](https://github.com/VRSEN/agency-swarm/blob/main/docs/platform/marketplace/openclaw.mdx)
 
 ## ⚙️ How This Template Works
 
-- `main.py` starts standard Agency Swarm FastAPI routes via `run_fastapi(...)`
-- `attach_openclaw_to_fastapi(...)` mounts OpenClaw proxy routes at `/openclaw/*`
-- Proxy forwards to OpenClaw gateway (`127.0.0.1:18789`) with Open Responses compatibility
+- `main.py` starts the FastAPI app
+- `attach_openclaw_to_fastapi(...)` mounts the OpenClaw proxy at `/openclaw/*`
+- `OpenClawAgent` keeps the template code thin and handles the OpenClaw connection behind the scenes
 - OpenClaw state persists under `/mnt/openclaw` in deployed environments
 
-### Runtime defaults
+If you want to use OpenClaw inside your own Agency Swarm code, see the [OpenClawAgent framework guide](https://github.com/VRSEN/agency-swarm/blob/main/docs/core-framework/agents/openclaw-agent.mdx).
 
-- `OPENCLAW_HOME=/mnt/openclaw`
-- `OPENCLAW_STATE_DIR=/mnt/openclaw/state`
-- `OPENCLAW_CONFIG_PATH=/mnt/openclaw/openclaw.json`
-- `OPENCLAW_LOG_PATH=/mnt/openclaw/logs/openclaw-gateway.log`
-- `OPENCLAW_PORT=18789`
-- `OPENCLAW_PROVIDER_MODEL` (set via onboarding override or environment)
+### What shapes behavior
 
-This template's onboarding default sets `OPENCLAW_PROVIDER_MODEL` to `openai/gpt-5.2`.
-
-### Configuration source of truth
-
-- Onboarding form sets your assistant identity and core instructions.
+- The onboarding form sets the assistant name, summary, and extra instructions.
 - OpenClaw workspace files under `/mnt/openclaw/.openclaw/workspace` (`AGENTS.md`, `SOUL.md`, etc.) are also read by OpenClaw.
-- These two instruction sources are combined. They do not automatically replace each other.
-- If they conflict, behavior can feel inconsistent, so keep them aligned.
-- For `OPENCLAW_*` settings, explicit environment values win over onboarding defaults.
+- In local Docker runs, the same files appear on your host under `.data/openclaw/.openclaw/workspace` because `.data` is mounted to `/mnt`.
+- Both influence behavior, so keep them aligned.
 
 ---
 
-## 🧠 Instruction Sources (Important)
+## 🧠 Customize Behavior
 
-Behavior can come from two places:
+If responses feel off, check both places that shape behavior:
 
-1. Onboarding instructions
+1. onboarding settings from Agencii
 2. OpenClaw workspace files on persistent storage
 
-Common OpenClaw workspace files:
+Common workspace files:
 
 - `/mnt/openclaw/.openclaw/workspace/AGENTS.md`
 - `/mnt/openclaw/.openclaw/workspace/SOUL.md`
 - `/mnt/openclaw/.openclaw/workspace/USER.md`
-- `/mnt/openclaw/.openclaw/workspace/IDENTITY.md`
-- `/mnt/openclaw/.openclaw/workspace/TOOLS.md`
-- `/mnt/openclaw/.openclaw/workspace/HEARTBEAT.md`
-- `/mnt/openclaw/.openclaw/workspace/MEMORY.md` (optional)
-
-If responses feel off, check both onboarding config and workspace files.
-
----
-
-## 🚀 Production Deployment With Agencii
-
-### Step 1: Connect repo
-
-- Use template to create repo
-- Connect repo in Agencii
-- Set provider keys in Agencii Secrets Vault
-
-### Step 2: Deploy
-
-- Start deployment from Agencii
-- Wait for build completion
-- Open your deployed chat UI and run first prompt
-
-### Step 3: Validate
-
-- Verify `/openclaw/health`
-- Verify chat streaming in your Agencii UI
+- `/mnt/openclaw/.openclaw/workspace/MEMORY.md`
 
 ---
 
@@ -175,45 +102,52 @@ If responses feel off, check both onboarding config and workspace files.
 
 ### Local development (FastAPI path)
 
+Use Docker if you want the closest match to production.
+Use the FastAPI path below if you want to run everything directly on your machine.
+Python 3.13 is the safest local choice for this template.
+This path assumes `nvm` and Python 3.13 are already installed locally.
+
 ```bash
+nvm install 22.14.0
+nvm use 22.14.0
+npm install -g openclaw@2026.3.2
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 cp .env.template .env
+# Edit .env now. The default model uses OPENAI_API_KEY.
+# If you want Anthropic instead, change OPENCLAW_PROVIDER_MODEL before you start.
+set -a; source .env; set +a
 python main.py
 ```
 
-Then run:
+Then run one of these:
+
+```bash
+curl http://127.0.0.1:8080/openclaw/health
+```
+
+If you set `APP_TOKEN`, use:
 
 ```bash
 curl -H "Authorization: Bearer $APP_TOKEN" http://127.0.0.1:8080/openclaw/health
 ```
 
-Note: local runtime requires OpenClaw + compatible Node available on your machine (or run via Docker).
+Local runtime needs OpenClaw plus Node `>=22.12.0`.
+If you do not have that on your machine, use the Docker path below instead.
 
 ### Docker local run (closest to production image)
+
+First create `.env` from `.env.template` and fill in the provider key your model needs. Then run:
+This path assumes Docker is already installed and running.
 
 ```bash
 docker build -t openclaw-template .
 docker run --rm -p 8080:8080 \
-  -e APP_TOKEN=local-token \
-  -e OPENAI_API_KEY=your_key \
+  --env-file .env \
   -v "$PWD/.data:/mnt" \
   openclaw-template
 ```
-
----
-
-## 📚 Key Features
-
-- **Deploy in a few clicks** on Agencii with starter template
-- **OpenClaw + Agency Swarm integration** under one FastAPI app
-- **Open Responses compatibility** through `/openclaw/v1/responses`
-- **Persistent runtime state** under `/mnt/openclaw`
-- **Onboarding-driven customization** without editing core runtime code
-- **Pinned runtime versions** in Dockerfile for deterministic builds
-
----
 
 ## 🔐 Security Notes
 
@@ -245,35 +179,10 @@ Upgrade policy:
 
 ---
 
-## 📖 Learn More
-
-- [Agency Swarm](https://github.com/VRSEN/agency-swarm)
-- [OpenClaw Docs](https://docs.openclaw.ai/)
-- [Agencii Platform](https://agencii.ai/)
-
----
-
-## ⚡ Quick Tips
-
-- Start with default onboarding fields; customize only after first successful deploy.
-- Put stable persona rules in OpenClaw workspace files (`AGENTS.md`, `SOUL.md`).
-- Use Agencii Secrets Vault as source of truth for provider credentials.
-
----
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Submit a pull request
-
----
-
 ## Notes on Agency Swarm dependency
 
-This template currently installs `agency-swarm` from the integration branch:
+This template currently installs `agency-swarm` from the OpenClaw worker branch:
 
-- `agency-swarm[fastapi] @ git+https://github.com/VRSEN/agency-swarm.git@codex/openclaw-agencii-v1`
+- `agency-swarm[fastapi] @ git+https://github.com/VRSEN/agency-swarm.git@codex/openclaw-agent-worker`
 
 Move to an official release tag once OpenClaw integration APIs are published to `main`/PyPI.
