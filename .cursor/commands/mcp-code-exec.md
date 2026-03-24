@@ -97,7 +97,7 @@ server_name_mcp = MCPServerStdio( # replace server_name with the name of the MCP
 #         "command": "npx",
 #         "args": ["-y", "mcp-remote", "https://your-server.com/mcp"],
 #         "env": {
-#             "MCP_REMOTE_CONFIG_DIR": os.path.join(folder_path, "mnt", "mcp-creds") # persistent storage for OAuth credentials, don't add to .gitignore
+#             "MCP_REMOTE_CONFIG_DIR": os.path.join(folder_path, "mnt", "openclaw", "mcp-creds") # persistent storage under /mnt/openclaw, don't add to .gitignore
 #         }
 #     },
 #     cache_tools_list=True,
@@ -305,7 +305,7 @@ When you need to access MCP tools:
 **Fix**:
 
 1. Ensure `MCP_REMOTE_CONFIG_DIR` is set correctly for mcp-remote servers.
-2. Ensure all other MCP servers store credentials in `./mnt/mcp-creds`.
+2. Ensure all other MCP servers store credentials under `/mnt/openclaw/mcp-creds`.
 3. Do not add credentials to .gitignore or .dockerignore. Instead, tell the user to ensure their repo is not public.
 4. Make sure to add node install to Dockerfile if using any npm servers, like mcp-remote.
 
