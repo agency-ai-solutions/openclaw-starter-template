@@ -22,14 +22,16 @@ Create your own repository from this template:
 
 ### 3. Add provider secrets
 
-- Add provider secrets in Agencii Secrets Vault (`OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, etc.)
-- Add at least one provider key before deploy. You only need the key for the provider your chosen model uses
-- Set `OPENCLAW_PROVIDER_MODEL` as a normal deploy-time environment variable, not as a secret
-- If you switch to another provider, add that provider's env var too
-- Add `APP_TOKEN` too only if you want protected FastAPI routes
-- For local development, copy `.env.template` to `.env`, then fill in the provider key your chosen model needs before you start the app
+- Default deploy: add `OPENAI_API_KEY`
+- Optional: set `APP_TOKEN` if you want protected FastAPI routes
+- Advanced: only set `OPENCLAW_PROVIDER_MODEL`, `OPENCLAW_GATEWAY_TOKEN`, or another provider key if you are intentionally changing the default setup
+- For local development, copy `.env.template` to `.env`, then fill in the values you actually plan to use
 
-### 4. Fill the onboarding form
+### 4. Enable persistent storage
+
+- Turn on **Persistent File Storage** for the swarm before the first deploy
+- OpenClaw keeps its state and workspace files under `/mnt/openclaw`, so this must be enabled
+### 5. Fill the onboarding form
 
 Use the onboarding form in Agencii to define your assistant:
 
@@ -41,11 +43,11 @@ Do not put API keys in onboarding fields.
 
 ![Marketplace onboarding form example](https://raw.githubusercontent.com/VRSEN/agency-swarm/main/docs/images/platform/onboarding_form.png)
 
-### 5. Deploy
+### 6. Deploy
 
 - Start deployment in Agencii and wait for build completion
 
-### 6. Verify
+### 7. Verify
 
 After deploy, open the chat and send your first message.
 If you want a quick health check too, call:
@@ -69,7 +71,8 @@ For the full platform walkthrough, see:
 - `main.py` starts the FastAPI app
 - `attach_openclaw_to_fastapi(...)` mounts the OpenClaw proxy at `/openclaw/*`
 - `OpenClawAgent` keeps the template code thin and handles the OpenClaw connection behind the scenes
-- OpenClaw state persists under `/mnt/openclaw` in deployed environments
+- OpenClaw runtime uses `/mnt/openclaw` in deployed environments
+- In Agent Swarm's file browser, that same mounted volume appears under `/app/mnt/openclaw`
 
 If you want to use OpenClaw inside your own Agency Swarm code, see the [OpenClawAgent framework guide](https://github.com/VRSEN/agency-swarm/blob/main/docs/core-framework/agents/openclaw-agent.mdx).
 
@@ -77,6 +80,7 @@ If you want to use OpenClaw inside your own Agency Swarm code, see the [OpenClaw
 
 - The onboarding form sets the assistant name, summary, and extra instructions.
 - OpenClaw workspace files under `/mnt/openclaw/.openclaw/workspace` (`AGENTS.md`, `SOUL.md`, etc.) are also read by OpenClaw.
+- In Agent Swarm's file browser, open `/app/mnt/openclaw/.openclaw/workspace` to edit those files.
 - In local Docker runs, the same files appear on your host under `.data/openclaw/.openclaw/workspace` because `.data` is mounted to `/mnt`.
 - Both influence behavior, so keep them aligned.
 
@@ -91,10 +95,11 @@ If responses feel off, check both places that shape behavior:
 
 Common workspace files:
 
-- `/mnt/openclaw/.openclaw/workspace/AGENTS.md`
-- `/mnt/openclaw/.openclaw/workspace/SOUL.md`
-- `/mnt/openclaw/.openclaw/workspace/USER.md`
-- `/mnt/openclaw/.openclaw/workspace/MEMORY.md`
+- Runtime path: `/mnt/openclaw/.openclaw/workspace/*`
+- File browser path: `/app/mnt/openclaw/.openclaw/workspace/AGENTS.md`
+- File browser path: `/app/mnt/openclaw/.openclaw/workspace/SOUL.md`
+- File browser path: `/app/mnt/openclaw/.openclaw/workspace/USER.md`
+- File browser path: `/app/mnt/openclaw/.openclaw/workspace/MEMORY.md`
 
 ---
 
@@ -110,13 +115,12 @@ This path assumes `nvm` and Python 3.13 are already installed locally.
 ```bash
 nvm install 22.14.0
 nvm use 22.14.0
-npm install -g openclaw@2026.3.2
+npm install -g openclaw@2026.3.23-2
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 cp .env.template .env
-# Edit .env now. The default model uses OPENAI_API_KEY.
-# If you want Anthropic instead, change OPENCLAW_PROVIDER_MODEL before you start.
+# Edit .env now. The default model uses OPENAI_API_KEY with OpenAI GPT-5.4.
 set -a; source .env; set +a
 python main.py
 ```
@@ -160,15 +164,28 @@ OpenClaw references:
 - [OpenClaw Security Policy](https://github.com/openclaw/openclaw/blob/main/SECURITY.md)
 - [OpenClaw Trust Center](https://trust.openclaw.ai)
 
+## Advanced Model Changes
+
+The default setup uses:
+
+- `OPENAI_API_KEY`
+- `OPENCLAW_PROVIDER_MODEL=openai/gpt-5.4`
+
+Only change `OPENCLAW_PROVIDER_MODEL` if you intentionally want a different provider or model.
+If you do that, add the matching provider secret too.
+
+`OPENCLAW_GATEWAY_TOKEN` is optional.
+Leave it unset unless you need to override the internal token used between Agency Swarm and the local OpenClaw gateway.
+
 ---
 
 ## 📦 Version Pinning And Upgrades
 
-Pinned build args in `Dockerfile`:
+Pinned runtime versions in `Dockerfile`:
 
-- `PYTHON_VERSION=3.13.2`
+- Python base image: `python:3.13.2-slim`
 - `NODE_VERSION=22.14.0`
-- `OPENCLAW_VERSION=2026.3.2`
+- `OPENCLAW_VERSION=2026.3.23-2`
 
 Upgrade policy:
 

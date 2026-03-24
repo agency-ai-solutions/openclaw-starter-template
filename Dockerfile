@@ -1,17 +1,6 @@
+FROM python:3.13.2-slim
 ARG NODE_VERSION=22.14.0
-ARG PYTHON_VERSION=3.13.2
-ARG OPENCLAW_VERSION=2026.3.2
-
-FROM node:${NODE_VERSION}-slim AS openclaw-runtime
-ARG OPENCLAW_VERSION
-RUN apt-get update && apt-get install -y --no-install-recommends git ca-certificates && rm -rf /var/lib/apt/lists/*
-RUN update-ca-certificates
-RUN git config --global --add url."https://github.com/".insteadOf ssh://git@github.com/ \
-    && git config --global --add url."https://github.com/".insteadOf git@github.com:
-RUN npm install --global openclaw@${OPENCLAW_VERSION}
-
-FROM python:${PYTHON_VERSION}-slim
-ARG OPENCLAW_VERSION
+ARG OPENCLAW_VERSION=2026.3.23-2
 
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
@@ -23,14 +12,24 @@ ENV PYTHONUNBUFFERED=1 \
     OPENCLAW_PORT=18789 \
     OPENCLAW_DEFAULT_MODEL=openclaw:main
 
-COPY --from=openclaw-runtime /usr/local/bin/node /usr/local/bin/node
-COPY --from=openclaw-runtime /usr/local/lib/node_modules/openclaw /usr/local/lib/node_modules/openclaw
-RUN ln -sf ../lib/node_modules/openclaw/openclaw.mjs /usr/local/bin/openclaw
-
 WORKDIR /app
 
 RUN apt-get update && \
-    apt-get install --yes --no-install-recommends git && \
+    apt-get install --yes --no-install-recommends ca-certificates curl git xz-utils && \
+    rm -rf /var/lib/apt/lists/* && \
+    update-ca-certificates && \
+    arch="$(dpkg --print-architecture)" && \
+    case "$arch" in \
+      amd64) node_arch="x64" ;; \
+      arm64) node_arch="arm64" ;; \
+      *) echo "Unsupported architecture: $arch" >&2; exit 1 ;; \
+    esac && \
+    curl -fsSL "https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-${node_arch}.tar.xz" -o /tmp/node.tar.xz && \
+    tar -xJf /tmp/node.tar.xz -C /usr/local --strip-components=1 --no-same-owner && \
+    rm /tmp/node.tar.xz && \
+    git config --global --add url."https://github.com/".insteadOf ssh://git@github.com/ && \
+    git config --global --add url."https://github.com/".insteadOf git@github.com: && \
+    npm install --global "openclaw@${OPENCLAW_VERSION}" && \
     rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt .

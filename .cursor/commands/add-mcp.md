@@ -283,8 +283,8 @@ oauth_mcp_server = MCPServerStdio(
             "https://your-server.com/mcp"  # The hosted MCP server URL
         ],
         "env": {
-            # Store OAuth credentials in ./mnt/mcp_credentials/ folder for persistence
-            "MCP_REMOTE_CONFIG_DIR": os.path.join(folder_path, "mnt", "mcp_credentials")
+            # Store OAuth credentials under the persistent OpenClaw volume
+            "MCP_REMOTE_CONFIG_DIR": os.path.join(folder_path, "mnt", "openclaw", "mcp_credentials")
         }
     },
     cache_tools_list=True,  # REQUIRED: Enable caching
@@ -300,8 +300,8 @@ oauth_mcp_server = MCPServerStdio(
 
 1. `mcp-remote` acts as a bridge between local stdio and remote OAuth servers
 2. On first run, it will open a browser for OAuth authentication
-3. Credentials are saved in the `mnt/mcp_credentials/` folder (don't add to `.gitignore`)
-4. Subsequent runs reuse the saved tokens automatically. ./mnt folder is for persistent storage.
+3. Credentials are saved under `/mnt/openclaw/mcp_credentials/`
+4. Subsequent runs reuse the saved tokens automatically. That folder lives on persistent storage.
 
 **Example of a Notion MCP Server:**
 
@@ -313,7 +313,7 @@ notion_mcp = MCPServerStdio(
         "command": "npx",
         "args": ["-y", "mcp-remote", "https://mcp.notion.com/mcp"],
         "env": {
-            "MCP_REMOTE_CONFIG_DIR": os.path.join(folder_path, "mcp_credentials")
+            "MCP_REMOTE_CONFIG_DIR": os.path.join(folder_path, "mnt", "openclaw", "mcp_credentials")
         }
     },
     cache_tools_list=True,
@@ -419,7 +419,7 @@ notion_mcp = MCPServerStdio(
         "command": "npx",
         "args": ["-y", "mcp-remote", "https://mcp.notion.com/mcp"],
         "env": {
-            "MCP_REMOTE_CONFIG_DIR": os.path.join(folder_path, "mnt", "mcp_credentials")
+            "MCP_REMOTE_CONFIG_DIR": os.path.join(folder_path, "mnt", "openclaw", "mcp_credentials")
         }
     },
     cache_tools_list=True,

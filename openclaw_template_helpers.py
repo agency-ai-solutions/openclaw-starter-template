@@ -16,7 +16,7 @@ _DEFAULT_ONBOARDING_CONFIG: dict[str, str] = {
     "assistant_description": "A private OpenClaw assistant running on Agencii.",
     "assistant_instructions": "Handle user tasks and call the right OpenClaw tools when needed.",
     "openclaw_model": "openclaw:main",
-    "openclaw_config_overrides_json": '{"OPENCLAW_PROVIDER_MODEL":"openai/gpt-5.2"}',
+    "openclaw_config_overrides_json": '{"OPENCLAW_PROVIDER_MODEL":"openai/gpt-5.4"}',
 }
 
 try:
