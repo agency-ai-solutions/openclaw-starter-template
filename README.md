@@ -30,7 +30,8 @@ Create your own repository from this template:
 ### 4. Enable persistent storage
 
 - Turn on **Persistent File Storage** for the swarm before the first deploy
-- OpenClaw keeps its state and workspace files under `/mnt/openclaw`, so this must be enabled
+- Set `OPENCLAW_HOME=/app/mnt/openclaw`
+- OpenClaw derives its state, config, and log paths from that root automatically
 ### 5. Fill the onboarding form
 
 Use the onboarding form in Agencii to define your assistant:
@@ -71,15 +72,15 @@ For the full platform walkthrough, see:
 - `main.py` starts the FastAPI app
 - `attach_openclaw_to_fastapi(...)` mounts the OpenClaw proxy at `/openclaw/*`
 - `OpenClawAgent` keeps the template code thin and handles the OpenClaw connection behind the scenes
-- OpenClaw runtime uses `/mnt/openclaw` in deployed environments
-- In Agent Swarm's file browser, that same mounted volume appears under `/app/mnt/openclaw`
+- OpenClaw runtime uses `OPENCLAW_HOME=/app/mnt/openclaw` in Agent Swarm deploys
+- In Agent Swarm's file browser, that same mounted volume appears directly under `/app/mnt/openclaw`
 
 If you want to use OpenClaw inside your own Agency Swarm code, see the [OpenClawAgent framework guide](https://github.com/VRSEN/agency-swarm/blob/main/docs/core-framework/agents/openclaw-agent.mdx).
 
 ### What shapes behavior
 
 - The onboarding form sets the assistant name, summary, and extra instructions.
-- OpenClaw workspace files under `/mnt/openclaw/.openclaw/workspace` (`AGENTS.md`, `SOUL.md`, etc.) are also read by OpenClaw.
+- OpenClaw workspace files under `/app/mnt/openclaw/.openclaw/workspace` (`AGENTS.md`, `SOUL.md`, etc.) are also read by OpenClaw.
 - In Agent Swarm's file browser, open `/app/mnt/openclaw/.openclaw/workspace` to edit those files.
 - In local Docker runs, the same files appear on your host under `.data/openclaw/.openclaw/workspace` because `.data` is mounted to `/mnt`.
 - Both influence behavior, so keep them aligned.
@@ -95,7 +96,6 @@ If responses feel off, check both places that shape behavior:
 
 Common workspace files:
 
-- Runtime path: `/mnt/openclaw/.openclaw/workspace/*`
 - File browser path: `/app/mnt/openclaw/.openclaw/workspace/AGENTS.md`
 - File browser path: `/app/mnt/openclaw/.openclaw/workspace/SOUL.md`
 - File browser path: `/app/mnt/openclaw/.openclaw/workspace/USER.md`

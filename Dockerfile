@@ -5,12 +5,10 @@ ARG OPENCLAW_VERSION=2026.3.23-2
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     PATH="/root/.local/bin:${PATH}" \
-    OPENCLAW_HOME=/mnt/openclaw \
-    OPENCLAW_STATE_DIR=/mnt/openclaw/state \
-    OPENCLAW_CONFIG_PATH=/mnt/openclaw/openclaw.json \
-    OPENCLAW_LOG_PATH=/mnt/openclaw/logs/openclaw-gateway.log \
+    OPENCLAW_HOME=/app/mnt/openclaw \
     OPENCLAW_PORT=18789 \
-    OPENCLAW_DEFAULT_MODEL=openclaw:main
+    OPENCLAW_DEFAULT_MODEL=openclaw:main \
+    OPENCLAW_PROVIDER_MODEL=openai/gpt-5.4
 
 WORKDIR /app
 
