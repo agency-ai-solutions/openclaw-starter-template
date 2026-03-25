@@ -34,16 +34,19 @@ Defined in `onboarding_tool.py`:
 
 Running `python onboarding_tool.py` writes `onboarding_config.py`.
 
-## Runtime defaults (`/mnt` persistence)
+## Runtime defaults (Agent Swarm persistent storage)
 
 `openclaw:main` stays as the external model id, while `OPENCLAW_PROVIDER_MODEL` controls which provider model runs upstream.
 
-- `OPENCLAW_HOME=/mnt/openclaw`
-- `OPENCLAW_STATE_DIR=/mnt/openclaw/state`
-- `OPENCLAW_CONFIG_PATH=/mnt/openclaw/openclaw.json`
-- `OPENCLAW_LOG_PATH=/mnt/openclaw/logs/openclaw-gateway.log`
+- `OPENCLAW_HOME=/app/mnt/openclaw`
 - `OPENCLAW_PORT=18789`
-- `OPENCLAW_PROVIDER_MODEL=openai/gpt-5-mini`
+- `OPENCLAW_PROVIDER_MODEL=openai/gpt-5.4`
+
+From `OPENCLAW_HOME`, the framework derives:
+
+- `OPENCLAW_STATE_DIR=<OPENCLAW_HOME>/state`
+- `OPENCLAW_CONFIG_PATH=<OPENCLAW_HOME>/openclaw.json`
+- `OPENCLAW_LOG_PATH=<OPENCLAW_HOME>/logs/openclaw-gateway.log`
 
 ## Instructions behavior
 
@@ -88,7 +91,7 @@ Local Node requirement:
 - OpenClaw requires Node `>=22.12.0`.
 - If you have multiple Node installs, set `OPENCLAW_NODE_BIN` to the compatible binary path (for example `/opt/homebrew/bin/node` on macOS).
 
-Local note: if your machine does not provide writable `/mnt`, set `OPENCLAW_HOME`, `OPENCLAW_STATE_DIR`, `OPENCLAW_CONFIG_PATH`, and `OPENCLAW_LOG_PATH` to a writable local path.
+Local note: if your machine does not provide writable `/app/mnt`, set `OPENCLAW_HOME` to a writable local path and let the derived paths follow it.
 
 Then call:
 
