@@ -47,7 +47,7 @@ class OnboardingTool(BaseTool):
 if __name__ == "__main__":
     tool = OnboardingTool(
         assistant_name="OpenClaw Assistant",
-        assistant_description="A private OpenClaw assistant running on Agencii.",
+        assistant_description="A private OpenClaw assistant running on Agent Swarm.",
         assistant_instructions="",
     )
     print(tool.run())

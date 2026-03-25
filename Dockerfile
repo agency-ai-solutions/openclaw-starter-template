@@ -1,12 +1,15 @@
 FROM python:3.13.2-slim
-ARG NODE_VERSION=22.14.0
+ARG NODE_VERSION=22.22.1
 ARG OPENCLAW_VERSION=2026.3.23-2
 
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     PATH="/root/.local/bin:${PATH}" \
+    NODE_OPTIONS=--max-old-space-size=768 \
     OPENCLAW_HOME=/app/mnt/openclaw \
     OPENCLAW_PORT=18789 \
+    OPENCLAW_STARTUP_TIMEOUT_SECONDS=180 \
+    OPENCLAW_GATEWAY_COMMAND="openclaw gateway" \
     OPENCLAW_DEFAULT_MODEL=openclaw:main \
     OPENCLAW_PROVIDER_MODEL=openai/gpt-5.4
 
@@ -37,6 +40,6 @@ RUN pip install --upgrade pip && \
 COPY . .
 
 # update as necessary in accordance with the security policy
-USER root 
+USER root
 
 CMD ["python", "-u", "main.py"]
