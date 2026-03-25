@@ -9,3 +9,7 @@ keywords = ["agency-swarm", "agencii", "openclaw"]
 
 [tool.template]
 version = "0.1.0"
+
+[tool.build]
+memory="1564"
+cpu="1"
