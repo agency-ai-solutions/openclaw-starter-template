@@ -13,7 +13,7 @@ load_dotenv()
 
 _DEFAULT_ONBOARDING_CONFIG: dict[str, str] = {
     "assistant_name": "OpenClaw Assistant",
-    "assistant_description": "A private OpenClaw assistant running on Agencii.",
+    "assistant_description": "A private OpenClaw assistant running on Agent Swarm.",
     "assistant_instructions": "Handle user tasks and call the right OpenClaw tools when needed.",
     "openclaw_model": "openclaw:main",
     "openclaw_config_overrides_json": '{"OPENCLAW_PROVIDER_MODEL":"openai/gpt-5.4"}',
@@ -32,8 +32,12 @@ class OpenClawTemplateConfig:
     instructions: str
 
 
-def load_openclaw_template_config() -> OpenClawTemplateConfig:
+def apply_openclaw_environment_overrides() -> None:
     _apply_legacy_openclaw_config()
+
+
+def load_openclaw_template_config() -> OpenClawTemplateConfig:
+    apply_openclaw_environment_overrides()
     return OpenClawTemplateConfig(
         assistant_name=_read_config_value("assistant_name", fallback_key="agent_name")
         or _DEFAULT_ONBOARDING_CONFIG["assistant_name"],

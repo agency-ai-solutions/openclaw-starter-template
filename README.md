@@ -1,8 +1,10 @@
-# OpenClaw Starter Template for Agencii
+# OpenClaw Starter Template for Agent Swarm
 
-Deploy your own private OpenClaw assistant on [Agencii](https://agencii.ai/) in a few clicks.
+Deploy your own OpenClaw assistant on [agentswarm.ai](https://agentswarm.ai/) with a guided setup flow.
 
 Use this repository when you want a ready OpenClaw deployment path, not a blank Agency Swarm project.
+
+---
 
 ## 🚀 Quick Start
 
@@ -14,27 +16,34 @@ Create your own repository from this template:
 - Click **Use this template**
 - Create a repository in your own GitHub account/org
 
-### 2. Connect the repository in Agencii
+### 2. Connect the repository in Agent Swarm
 
-- Sign in to [agencii.ai](https://agencii.ai/)
+- Sign in to [agentswarm.ai](https://agentswarm.ai/)
 - Connect your GitHub account
 - Select the repository created from this template
 
 ### 3. Add provider secrets
 
-- Default deploy: add `OPENAI_API_KEY`
-- Optional: set `APP_TOKEN` if you want protected FastAPI routes
-- Advanced: only set `OPENCLAW_PROVIDER_MODEL`, `OPENCLAW_GATEWAY_TOKEN`, or another provider key if you are intentionally changing the default setup
-- For local development, copy `.env.template` to `.env`, then fill in the values you actually plan to use
+In Agent Swarm, open the swarm deploy form and add only the secrets your deploy actually needs.
+Default path:
+
+- Required: `OPENAI_API_KEY`
+- Optional: `APP_TOKEN` if you want bearer-token protection on public `/openclaw/*` routes
+- Optional: `OPENCLAW_PROVIDER_MODEL` only if you intentionally want a different model or provider
+- Optional: `OPENCLAW_GATEWAY_TOKEN` only if you want to override the internal token between Agent Swarm and the local OpenClaw gateway
+- Optional: `ANTHROPIC_API_KEY` only if you switch `OPENCLAW_PROVIDER_MODEL` to an Anthropic model
+- For local development, copy `.env.template` to `.env`, then fill in only the values you plan to use
 
 ### 4. Enable persistent storage
 
 - Turn on **Persistent File Storage** for the swarm before the first deploy
 - Set `OPENCLAW_HOME=/app/mnt/openclaw`
-- OpenClaw derives its state, config, and log paths from that root automatically
+- OpenClaw derives its state, config, log, and workspace paths from that root automatically
+- This keeps the OpenClaw state alive across rebuilds and redeploys
+
 ### 5. Fill the onboarding form
 
-Use the onboarding form in Agencii to define your assistant:
+Use the onboarding form in Agent Swarm to define your assistant:
 
 - Name shown in chat
 - What it should help with
@@ -46,7 +55,8 @@ Do not put API keys in onboarding fields.
 
 ### 6. Deploy
 
-- Start deployment in Agencii and wait for build completion
+- Start deployment in Agent Swarm and wait for build completion
+- The first deploy may take a few extra minutes
 
 ### 7. Verify
 
@@ -65,13 +75,24 @@ curl -H "Authorization: Bearer <APP_TOKEN>" https://<your-deployed-domain>/openc
 
 For the full platform walkthrough, see:
 
-- [OpenClaw on Agencii](https://github.com/VRSEN/agency-swarm/blob/main/docs/platform/marketplace/openclaw.mdx)
+- [OpenClaw on Agent Swarm](https://github.com/VRSEN/agency-swarm/blob/main/docs/platform/marketplace/openclaw.mdx)
+
+## ⚙️ Advanced Configuration
+
+Only change these if you are intentionally customizing the default setup:
+
+- `OPENCLAW_PROVIDER_MODEL` to switch away from the default `openai/gpt-5.4`
+- `APP_TOKEN` to protect FastAPI routes with a bearer token
+- `OPENCLAW_GATEWAY_TOKEN` to override the internal token between Agent Swarm and the local OpenClaw gateway
+- `ANTHROPIC_API_KEY` or another provider key only if you switch to that provider
 
 ## ⚙️ How This Template Works
 
 - `main.py` starts the FastAPI app
 - `attach_openclaw_to_fastapi(...)` mounts the OpenClaw proxy at `/openclaw/*`
 - `OpenClawAgent` keeps the template code thin and handles the OpenClaw connection behind the scenes
+- In deploys, the image uses the pinned OpenClaw runtime directly
+- In local non-Docker runs, the template bootstraps the pinned OpenClaw runtime automatically when needed
 - OpenClaw runtime uses `OPENCLAW_HOME=/app/mnt/openclaw` in Agent Swarm deploys
 - In Agent Swarm's file browser, that same mounted volume appears directly under `/app/mnt/openclaw`
 
@@ -89,19 +110,23 @@ If you want to use OpenClaw inside your own Agency Swarm code, see the [OpenClaw
 
 ## 🧠 Customize Behavior
 
-If responses feel off, check both places that shape behavior:
+Default workflow:
 
-1. onboarding settings from Agencii
-2. OpenClaw workspace files on persistent storage
+- Use onboarding for normal assistant setup
+- Use workspace files only when you want persistent OpenClaw behavior
+- Use `OPENCLAW_*` environment variables only when you need an explicit override from the pinned template defaults
 
-Common workspace files:
+If responses feel off, check these in order:
+
+1. Onboarding settings from Agent Swarm
+2. Workspace files on persistent storage
+
+Advanced internals. Only use these if you want to edit OpenClaw workspace behavior directly:
 
 - File browser path: `/app/mnt/openclaw/workspace/AGENTS.md`
 - File browser path: `/app/mnt/openclaw/workspace/SOUL.md`
 - File browser path: `/app/mnt/openclaw/workspace/USER.md`
 - File browser path: `/app/mnt/openclaw/workspace/MEMORY.md`
-
----
 
 ## 🔨 Development Workflow
 
@@ -109,13 +134,11 @@ Common workspace files:
 
 Use Docker if you want the closest match to production.
 Use the FastAPI path below if you want to run everything directly on your machine.
-Python 3.13 is the safest local choice for this template.
-This path assumes `nvm` and Python 3.13 are already installed locally.
+Use Python 3.13 locally to match the production image.
+On first startup, the template will download the pinned OpenClaw runtime automatically if it is missing.
+Create `.env` from `.env.template` and fill in the values you plan to use.
 
 ```bash
-nvm install 22.14.0
-nvm use 22.14.0
-npm install -g openclaw@2026.3.23-2
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
@@ -137,13 +160,11 @@ If you set `APP_TOKEN`, use:
 curl -H "Authorization: Bearer $APP_TOKEN" http://127.0.0.1:8080/openclaw/health
 ```
 
-Local runtime needs OpenClaw plus Node `>=22.12.0`.
-If you do not have that on your machine, use the Docker path below instead.
+If your machine blocks the runtime download or you want the closest production match, use the Docker path below instead.
 
 ### Docker local run (closest to production image)
 
 First create `.env` from `.env.template` and fill in the provider key your model needs. Then run:
-This path assumes Docker is already installed and running.
 
 ```bash
 docker build -t openclaw-template .
@@ -153,11 +174,30 @@ docker run --rm -p 8080:8080 \
   openclaw-template
 ```
 
+That bind mount stores OpenClaw data on your host under `.data/openclaw`.
+
+## 🏗️ Project Structure
+
+```text
+openclaw-starter-template/
+├── main.py
+├── agency.py
+├── onboarding_tool.py
+├── onboarding_config.py
+├── openclaw_template_helpers.py
+├── openclaw_runtime_bootstrap.py
+├── Dockerfile
+├── requirements.txt
+└── README.md
+```
+
 ## 🔐 Security Notes
 
-- This deployment is intended to be a private OpenClaw instance.
-- Provider API keys are injected into runtime env so OpenClaw can call provider APIs.
-- Do not share one instance across untrusted users.
+- This deployment is meant for one team or owner
+- Provider API keys are injected into runtime env so OpenClaw can call provider APIs
+- Do not share one instance across untrusted users
+- If `APP_TOKEN` is unset, the `/openclaw/*` FastAPI routes are not protected
+- Set `APP_TOKEN` before deploy if you want bearer-token protection on those routes
 
 OpenClaw references:
 
@@ -181,15 +221,17 @@ Leave it unset unless you need to override the internal token used between Agenc
 
 ## 📦 Version Pinning And Upgrades
 
-Pinned runtime versions in `Dockerfile`:
+Pinned runtime versions in this template:
 
 - Python base image: `python:3.13.2-slim`
-- `NODE_VERSION=22.14.0`
-- `OPENCLAW_VERSION=2026.3.23-2`
+- Docker Node runtime: `22.22.1`
+- OpenClaw runtime: `2026.3.23-2`
+
+The local bootstrap path uses the same pinned OpenClaw runtime from `openclaw_runtime_bootstrap.py`.
 
 Upgrade policy:
 
-1. Bump versions intentionally (no auto-float)
+1. Bump versions intentionally
 2. Rebuild image
 3. Run local smoke tests + stream checks
 4. Promote only after verification
@@ -202,4 +244,4 @@ This template currently installs `agency-swarm` from the OpenClaw worker branch:
 
 - `agency-swarm[fastapi] @ git+https://github.com/VRSEN/agency-swarm.git@codex/openclaw-agent-worker`
 
-Move to an official release tag once OpenClaw integration APIs are published to `main`/PyPI.
+Move to an official release tag once OpenClaw integration APIs are published to `main` or PyPI.
