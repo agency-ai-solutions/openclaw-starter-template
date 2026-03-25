@@ -80,9 +80,9 @@ If you want to use OpenClaw inside your own Agency Swarm code, see the [OpenClaw
 ### What shapes behavior
 
 - The onboarding form sets the assistant name, summary, and extra instructions.
-- OpenClaw workspace files under `/app/mnt/openclaw/.openclaw/workspace` (`AGENTS.md`, `SOUL.md`, etc.) are also read by OpenClaw.
-- In Agent Swarm's file browser, open `/app/mnt/openclaw/.openclaw/workspace` to edit those files.
-- In local Docker runs, the same files appear on your host under `.data/openclaw/.openclaw/workspace` because `.data` is mounted to `/mnt`.
+- OpenClaw workspace files under `/app/mnt/openclaw/workspace` (`AGENTS.md`, `SOUL.md`, etc.) are also read by OpenClaw.
+- In Agent Swarm's file browser, open `/app/mnt/openclaw/workspace` to edit those files.
+- In local Docker runs, mount `.data` to `/app/mnt` so the same files appear on your host under `.data/openclaw/workspace`.
 - Both influence behavior, so keep them aligned.
 
 ---
@@ -96,10 +96,10 @@ If responses feel off, check both places that shape behavior:
 
 Common workspace files:
 
-- File browser path: `/app/mnt/openclaw/.openclaw/workspace/AGENTS.md`
-- File browser path: `/app/mnt/openclaw/.openclaw/workspace/SOUL.md`
-- File browser path: `/app/mnt/openclaw/.openclaw/workspace/USER.md`
-- File browser path: `/app/mnt/openclaw/.openclaw/workspace/MEMORY.md`
+- File browser path: `/app/mnt/openclaw/workspace/AGENTS.md`
+- File browser path: `/app/mnt/openclaw/workspace/SOUL.md`
+- File browser path: `/app/mnt/openclaw/workspace/USER.md`
+- File browser path: `/app/mnt/openclaw/workspace/MEMORY.md`
 
 ---
 
@@ -149,7 +149,7 @@ This path assumes Docker is already installed and running.
 docker build -t openclaw-template .
 docker run --rm -p 8080:8080 \
   --env-file .env \
-  -v "$PWD/.data:/mnt" \
+  -v "$PWD/.data:/app/mnt" \
   openclaw-template
 ```
 
