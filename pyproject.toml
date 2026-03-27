@@ -9,6 +9,8 @@ keywords = ["agency-swarm", "agencii", "openclaw"]
 
 [tool.template]
 version = "0.1.0"
+openclaw = true
+build_prepare_command = "python -u prepare_openclaw_template.py"
 
 [tool.build]
 memory="1564"

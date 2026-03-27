@@ -31,7 +31,18 @@ _DEFAULT_NODE_OPTIONS = "--max-old-space-size=768"
 def ensure_openclaw_runtime() -> None:
     if not _read_bool_env("OPENCLAW_AUTOSTART", default=True):
         return
-    if os.getenv("OPENCLAW_GATEWAY_COMMAND"):
+
+    existing_gateway_command = _read_valid_gateway_command()
+    if existing_gateway_command:
+        os.environ["OPENCLAW_GATEWAY_COMMAND"] = existing_gateway_command
+        return
+
+    installed_gateway_command = _build_installed_gateway_command()
+    if installed_gateway_command:
+        home_dir = _resolve_bootstrap_home_dir()
+        os.environ["OPENCLAW_GATEWAY_COMMAND"] = installed_gateway_command
+        _ensure_minimal_config_file(home_dir)
+        logger.info("Using installed OpenClaw runtime at %s", shlex.split(installed_gateway_command)[0])
         return
 
     required_node_version = _read_runtime_version("OPENCLAW_NODE_VERSION", _DEFAULT_NODE_VERSION)
@@ -56,6 +67,32 @@ class _OpenClawRuntimePaths:
     node_bin: Path
     npm_bin: Path | None
     openclaw_bin: Path
+
+
+def _read_valid_gateway_command() -> str | None:
+    raw_command = os.getenv("OPENCLAW_GATEWAY_COMMAND")
+    if raw_command is None:
+        return None
+
+    normalized_command = raw_command.strip()
+    if not normalized_command:
+        return None
+
+    try:
+        shlex.split(normalized_command)
+    except ValueError:
+        logger.warning("Ignoring invalid OPENCLAW_GATEWAY_COMMAND=%r", raw_command)
+        os.environ.pop("OPENCLAW_GATEWAY_COMMAND", None)
+        return None
+
+    return normalized_command
+
+
+def _build_installed_gateway_command() -> str | None:
+    openclaw_bin = shutil.which("openclaw")
+    if not openclaw_bin:
+        return None
+    return f"{shlex.quote(openclaw_bin)} gateway run"
 
 
 def _read_bool_env(name: str, *, default: bool) -> bool:
@@ -330,7 +367,7 @@ def _export_runtime(runtime: _OpenClawRuntimePaths) -> None:
     os.environ["OPENCLAW_NODE_BIN"] = str(runtime.node_bin)
     os.environ.setdefault("NODE_OPTIONS", _DEFAULT_NODE_OPTIONS)
     gateway_bin = shlex.quote(str(runtime.openclaw_bin))
-    os.environ["OPENCLAW_GATEWAY_COMMAND"] = f"{gateway_bin} gateway"
+    os.environ["OPENCLAW_GATEWAY_COMMAND"] = f"{gateway_bin} gateway run"
 
 
 def _export_home_paths(home_dir: Path) -> None:
