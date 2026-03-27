@@ -79,13 +79,21 @@ def _read_valid_gateway_command() -> str | None:
         return None
 
     try:
-        shlex.split(normalized_command)
+        command_parts = shlex.split(normalized_command)
     except ValueError:
         logger.warning("Ignoring invalid OPENCLAW_GATEWAY_COMMAND=%r", raw_command)
         os.environ.pop("OPENCLAW_GATEWAY_COMMAND", None)
         return None
 
-    return normalized_command
+    normalized_parts = _normalize_gateway_command_parts(command_parts)
+    return shlex.join(normalized_parts)
+
+
+def _normalize_gateway_command_parts(command_parts: list[str]) -> list[str]:
+    if len(command_parts) >= 2 and command_parts[1] == "gateway":
+        if len(command_parts) == 2 or command_parts[2].startswith("-"):
+            return [command_parts[0], "gateway", "run", *command_parts[2:]]
+    return command_parts
 
 
 def _build_installed_gateway_command() -> str | None:
