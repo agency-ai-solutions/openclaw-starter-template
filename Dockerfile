@@ -5,23 +5,57 @@ ARG PYTHON_VERSION=3.13
 
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
+    DEBIAN_FRONTEND=noninteractive \
     PATH="/root/.local/bin:${PATH}" \
     NODE_OPTIONS=--max-old-space-size=768 \
     OPENCLAW_HOME=/app/mnt/openclaw \
     OPENCLAW_PORT=18789 \
     OPENCLAW_STARTUP_TIMEOUT_SECONDS=180 \
     OPENCLAW_DEFAULT_MODEL=openclaw:main \
-    OPENCLAW_PROVIDER_MODEL=openai/gpt-5.4
+    OPENCLAW_PROVIDER_MODEL=openai/gpt-5.4 \
+    DISPLAY=:1 \
+    XVFB_WHD=1920x1080x24 \
+    VNC_PORT=5900 \
+    NOVNC_PORT=6080
 
 WORKDIR /app
 
 RUN apt-get update && \
+    if command -v unminimize >/dev/null 2>&1; then yes | unminimize; fi && \
     apt-get install --yes --no-install-recommends \
       ca-certificates \
       curl \
+      dbus-x11 \
+      ffmpeg \
+      galculator \
+      gedit \
       git \
       gnupg \
+      libreoffice \
+      net-tools \
+      netcat-openbsd \
+      pcmanfm \
+      python3-launchpadlib \
+      scrot \
       software-properties-common \
+      sudo \
+      tint2 \
+      util-linux \
+      wget \
+      x11-apps \
+      x11-utils \
+      x11-xserver-utils \
+      x11vnc \
+      xauth \
+      xdotool \
+      xorg \
+      xpaint \
+      xpdf \
+      xserver-xorg \
+      xfce4 \
+      xfce4-goodies \
+      xfce4-terminal \
+      xvfb \
       xz-utils && \
     update-ca-certificates && \
     add-apt-repository --yes ppa:deadsnakes/ppa && \
@@ -48,6 +82,10 @@ RUN apt-get update && \
     rm /tmp/node.tar.xz && \
     git config --global --add url."https://github.com/".insteadOf ssh://git@github.com/ && \
     git config --global --add url."https://github.com/".insteadOf git@github.com: && \
+    git clone --branch e2b-desktop https://github.com/e2b-dev/noVNC.git /opt/noVNC && \
+    ln -sf /opt/noVNC/vnc.html /opt/noVNC/index.html && \
+    git clone --branch v0.12.0 https://github.com/novnc/websockify /opt/noVNC/utils/websockify && \
+    ln -sf /usr/bin/xfce4-terminal.wrapper /etc/alternatives/x-terminal-emulator && \
     npm install --global "openclaw@${OPENCLAW_VERSION}" && \
     rm -rf /var/lib/apt/lists/*
 
@@ -56,8 +94,12 @@ RUN pip install --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
 COPY . .
+COPY start_command.sh /start_command.sh
+RUN chmod +x /start_command.sh
 
 # update as necessary in accordance with the security policy
 USER root
 
-CMD ["python", "-u", "main.py"]
+EXPOSE 5900 6080 8080
+
+CMD ["/start_command.sh"]
