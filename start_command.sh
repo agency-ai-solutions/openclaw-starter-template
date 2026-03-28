@@ -60,3 +60,4 @@ x11vnc \
     >/tmp/novnc.log 2>&1 &
 
 exec python -u main.py
+

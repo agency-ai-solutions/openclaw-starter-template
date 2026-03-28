@@ -8,6 +8,7 @@ ENV PYTHONUNBUFFERED=1 \
     DEBIAN_FRONTEND=noninteractive \
     PATH="/root/.local/bin:${PATH}" \
     NODE_OPTIONS=--max-old-space-size=768 \
+    CHROME_BIN=/usr/local/bin/openclaw-browser \
     OPENCLAW_HOME=/app/mnt/openclaw \
     OPENCLAW_PORT=18789 \
     OPENCLAW_STARTUP_TIMEOUT_SECONDS=180 \
@@ -16,7 +17,9 @@ ENV PYTHONUNBUFFERED=1 \
     DISPLAY=:1 \
     XVFB_WHD=1920x1080x24 \
     VNC_PORT=5900 \
-    NOVNC_PORT=6080
+    NOVNC_PORT=6080 \
+    LIBGL_ALWAYS_SOFTWARE=1 \
+    MESA_LOADER_DRIVER_OVERRIDE=llvmpipe
 
 WORKDIR /app
 
@@ -27,11 +30,26 @@ RUN apt-get update && \
       curl \
       dbus-x11 \
       ffmpeg \
+      fonts-dejavu-core \
+      fonts-liberation \
+      fonts-noto \
+      fonts-noto-color-emoji \
+      fonts-ubuntu \
       galculator \
       gedit \
       git \
       gnupg \
+      libasound2 \
+      libatk-bridge2.0-0 \
+      libgbm1 \
+      libgtk-3-0 \
+      libnspr4 \
+      libnss3 \
+      libu2f-udev \
+      libvulkan1 \
       libreoffice \
+      mesa-utils \
+      mesa-vulkan-drivers \
       net-tools \
       netcat-openbsd \
       pcmanfm \
@@ -77,6 +95,17 @@ RUN apt-get update && \
       arm64) node_arch="arm64" ;; \
       *) echo "Unsupported architecture: $arch" >&2; exit 1 ;; \
     esac && \
+    case "$arch" in \
+      amd64) \
+        curl -fsSL https://dl.google.com/linux/linux_signing_key.pub | gpg --dearmor -o /usr/share/keyrings/google-linux.gpg && \
+        echo "deb [arch=amd64 signed-by=/usr/share/keyrings/google-linux.gpg] https://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list && \
+        apt-get update && \
+        apt-get install --yes --no-install-recommends google-chrome-stable \
+      ;; \
+      arm64) \
+        apt-get install --yes --no-install-recommends epiphany-browser \
+      ;; \
+    esac && \
     curl -fsSL "https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-${node_arch}.tar.xz" -o /tmp/node.tar.xz && \
     tar -xJf /tmp/node.tar.xz -C /usr/local --strip-components=1 --no-same-owner && \
     rm /tmp/node.tar.xz && \
@@ -94,8 +123,17 @@ RUN pip install --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
 COPY . .
+COPY browser_launcher.sh /usr/local/bin/openclaw-browser
 COPY start_command.sh /start_command.sh
-RUN chmod +x /start_command.sh
+RUN chmod +x /start_command.sh /usr/local/bin/openclaw-browser && \
+    if [ -f /usr/share/applications/google-chrome.desktop ]; then \
+      sed -i 's#^Exec=.*#Exec=/usr/local/bin/openclaw-browser %U#' /usr/share/applications/google-chrome.desktop; \
+    fi && \
+    if [ -f /usr/share/applications/org.gnome.Epiphany.desktop ]; then \
+      sed -i 's#^Exec=.*#Exec=/usr/local/bin/openclaw-browser %U#' /usr/share/applications/org.gnome.Epiphany.desktop; \
+    fi && \
+    update-alternatives --install /usr/bin/x-www-browser x-www-browser /usr/local/bin/openclaw-browser 200 && \
+    update-alternatives --install /usr/bin/gnome-www-browser gnome-www-browser /usr/local/bin/openclaw-browser 200
 
 # update as necessary in accordance with the security policy
 USER root
