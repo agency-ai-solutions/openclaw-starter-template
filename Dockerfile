@@ -63,6 +63,7 @@ RUN apt-get update && \
       x11-apps \
       x11-utils \
       x11-xserver-utils \
+      xdg-utils \
       x11vnc \
       xauth \
       xdotool \
@@ -124,16 +125,12 @@ RUN pip install --upgrade pip && \
 
 COPY . .
 COPY browser_launcher.sh /usr/local/bin/openclaw-browser
+COPY openclaw-browser.desktop /usr/share/applications/openclaw-browser.desktop
 COPY start_command.sh /start_command.sh
 RUN chmod +x /start_command.sh /usr/local/bin/openclaw-browser && \
-    if [ -f /usr/share/applications/google-chrome.desktop ]; then \
-      sed -i 's#^Exec=.*#Exec=/usr/local/bin/openclaw-browser %U#' /usr/share/applications/google-chrome.desktop; \
-    fi && \
-    if [ -f /usr/share/applications/org.gnome.Epiphany.desktop ]; then \
-      sed -i 's#^Exec=.*#Exec=/usr/local/bin/openclaw-browser %U#' /usr/share/applications/org.gnome.Epiphany.desktop; \
-    fi && \
     update-alternatives --install /usr/bin/x-www-browser x-www-browser /usr/local/bin/openclaw-browser 200 && \
-    update-alternatives --install /usr/bin/gnome-www-browser gnome-www-browser /usr/local/bin/openclaw-browser 200
+    update-alternatives --install /usr/bin/gnome-www-browser gnome-www-browser /usr/local/bin/openclaw-browser 200 && \
+    update-desktop-database /usr/share/applications || true
 
 # update as necessary in accordance with the security policy
 USER root
