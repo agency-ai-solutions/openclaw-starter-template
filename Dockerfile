@@ -1,6 +1,7 @@
-FROM python:3.13.2-slim
+FROM ubuntu:22.04
 ARG NODE_VERSION=22.22.1
 ARG OPENCLAW_VERSION=2026.3.23-2
+ARG PYTHON_VERSION=3.13
 
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
@@ -15,8 +16,26 @@ ENV PYTHONUNBUFFERED=1 \
 WORKDIR /app
 
 RUN apt-get update && \
-    apt-get install --yes --no-install-recommends ca-certificates curl git xz-utils && \
-    rm -rf /var/lib/apt/lists/* && \
+    apt-get install --yes --no-install-recommends \
+      ca-certificates \
+      curl \
+      git \
+      gnupg \
+      software-properties-common \
+      xz-utils && \
+    update-ca-certificates && \
+    add-apt-repository --yes ppa:deadsnakes/ppa && \
+    apt-get update && \
+    apt-get install --yes --no-install-recommends \
+      "python${PYTHON_VERSION}" \
+      "python${PYTHON_VERSION}-venv" && \
+    curl -fsSL https://bootstrap.pypa.io/get-pip.py -o /tmp/get-pip.py && \
+    "python${PYTHON_VERSION}" /tmp/get-pip.py && \
+    ln -sf "/usr/bin/python${PYTHON_VERSION}" /usr/local/bin/python3 && \
+    ln -sf "/usr/bin/python${PYTHON_VERSION}" /usr/local/bin/python && \
+    ln -sf /usr/local/bin/pip3.13 /usr/local/bin/pip3 && \
+    ln -sf /usr/local/bin/pip3.13 /usr/local/bin/pip && \
+    rm -f /tmp/get-pip.py && \
     update-ca-certificates && \
     arch="$(dpkg --print-architecture)" && \
     case "$arch" in \
