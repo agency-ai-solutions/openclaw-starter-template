@@ -171,7 +171,7 @@ def _resolve_bootstrap_home_dir() -> Path:
         _export_home_paths(home_dir)
         return home_dir
 
-    default_home = Path("/mnt/openclaw").expanduser().resolve()
+    default_home = Path("/app/mnt/openclaw").expanduser().resolve()
     if _can_write_home(default_home):
         _export_home_paths(default_home)
         return default_home
