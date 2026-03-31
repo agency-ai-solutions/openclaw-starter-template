@@ -125,6 +125,28 @@ def _normalize_runtime_value(value: str | None, default: str) -> str:
     return normalized
 
 
+def _read_json_string_array_env(name: str) -> list[str] | None:
+    raw_value = os.getenv(name, "").strip()
+    if not raw_value:
+        return None
+
+    try:
+        payload = json.loads(raw_value)
+    except json.JSONDecodeError as exc:
+        raise RuntimeError(f"{name} must be valid JSON.") from exc
+
+    if not isinstance(payload, list):
+        raise RuntimeError(f"{name} must be a JSON array of strings.")
+
+    normalized = [
+        item.strip() for item in payload if isinstance(item, str) and item.strip()
+    ]
+    if not normalized:
+        raise RuntimeError(f"{name} must contain at least one string value.")
+
+    return normalized
+
+
 def _bootstrap_runtime(home_dir: Path, node_version: str, openclaw_version: str) -> _OpenClawRuntimePaths:
     runtime_root = home_dir / ".runtime"
     runtime_root.mkdir(parents=True, exist_ok=True)
@@ -350,6 +372,8 @@ def _ensure_minimal_config_file(home_dir: Path) -> None:
     gateway_token = (os.getenv("OPENCLAW_GATEWAY_TOKEN") or os.getenv("APP_TOKEN") or "openclaw-local-token").strip()
     os.environ.setdefault("OPENCLAW_GATEWAY_TOKEN", gateway_token)
     provider_model = (os.getenv("OPENCLAW_PROVIDER_MODEL") or "openai/gpt-5.4").strip()
+    allowed_origins = _read_json_string_array_env("OPENCLAW_CONTROL_UI_ALLOWED_ORIGINS_JSON")
+    trusted_proxies = _read_json_string_array_env("OPENCLAW_TRUSTED_PROXIES_JSON")
 
     payload = {
         "gateway": {
@@ -361,6 +385,10 @@ def _ensure_minimal_config_file(home_dir: Path) -> None:
         },
         "agents": {"defaults": {"model": {"primary": provider_model}}},
     }
+    if allowed_origins:
+        payload["gateway"]["controlUi"] = {"allowedOrigins": allowed_origins}
+    if trusted_proxies:
+        payload["gateway"]["trustedProxies"] = trusted_proxies
 
     fd = os.open(config_path, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
     with os.fdopen(fd, "w", encoding="utf-8") as config_file:
