@@ -15,3 +15,4 @@ build_prepare_command = "python -u prepare_openclaw_template.py"
 [tool.build]
 memory="1564"
 cpu="1"
+use_vps = true
