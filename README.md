@@ -46,7 +46,7 @@ Default path:
 Use the onboarding form in Agent Swarm to define your assistant:
 
 - Name shown in chat
-- One short instruction about what it should help with
+- One short sentence saying what the assistant should do
 
 Do not put API keys in onboarding fields.
 
