@@ -46,12 +46,9 @@ Default path:
 Use the onboarding form in Agent Swarm to define your assistant:
 
 - Name shown in chat
-- What it should help with
-- Extra instructions you want to add before deploy
+- One short instruction about what it should help with
 
 Do not put API keys in onboarding fields.
-
-![Marketplace onboarding form example](https://raw.githubusercontent.com/VRSEN/agency-swarm/main/docs/images/platform/onboarding_form.png)
 
 ### 6. Deploy
 
@@ -96,7 +93,7 @@ Only change these if you are intentionally customizing the default setup:
 - OpenClaw runtime uses `OPENCLAW_HOME=/app/mnt/openclaw` in Agent Swarm deploys
 - In Agent Swarm's file browser, that same mounted volume appears directly under `/app/mnt/openclaw`
 
-If you want to use OpenClaw inside your own Agency Swarm code, see the [OpenClawAgent framework guide](https://github.com/VRSEN/agency-swarm/blob/main/docs/core-framework/agents/openclaw-agent.mdx).
+If you want to use OpenClaw inside your own Agency Swarm code, see the [OpenClawAgent framework guide](https://github.com/VRSEN/agency-swarm/blob/main/docs/core-framework/third-party-agents/openclaw-agent.mdx).
 
 ### What shapes behavior
 
@@ -240,8 +237,8 @@ Upgrade policy:
 
 ## Notes on Agency Swarm dependency
 
-This template currently installs `agency-swarm` from the OpenClaw worker branch:
+This template currently installs `agency-swarm` from `main`:
 
-- `agency-swarm[fastapi] @ git+https://github.com/VRSEN/agency-swarm.git@codex/openclaw-agent-worker`
+- `agency-swarm[fastapi] @ git+https://github.com/VRSEN/agency-swarm.git@main`
 
-Move to an official release tag once OpenClaw integration APIs are published to `main` or PyPI.
+Move to an official release tag once the shipped OpenClaw integration is published to PyPI.
